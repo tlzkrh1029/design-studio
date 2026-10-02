@@ -1,0 +1,5 @@
+# Reinstallable packages and runtime by-products
+node_modules/
+__pycache__/
+*.pyc
+.DS_Store
