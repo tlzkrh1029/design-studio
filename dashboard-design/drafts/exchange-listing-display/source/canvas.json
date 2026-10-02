@@ -1,0 +1,52 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Main.dc.html": {
+      "h": 740,
+      "title": "시안 A · VENUE 열 (LED 3칸)",
+      "w": 1520,
+      "x": 0,
+      "y": 0
+    },
+    "VariantB.dc.html": {
+      "h": 740,
+      "title": "시안 B · 티커 옆 3글자 플래그",
+      "w": 1520,
+      "x": 0,
+      "y": 860
+    },
+    "VariantC.dc.html": {
+      "h": 740,
+      "title": "시안 C · 2×2 글리프 + 커버리지 막대",
+      "w": 1520,
+      "x": 0,
+      "y": 1720
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-27T08:30:00Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "t1": {
+      "kind": "title1",
+      "maxW": 1520,
+      "text": "거래소 상장 표시 시안 A · B · C",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "VariantB.dc.html",
+    "VariantC.dc.html"
+  ],
+  "pages": [],
+  "title": "거래소 상장 표시 시안"
+}

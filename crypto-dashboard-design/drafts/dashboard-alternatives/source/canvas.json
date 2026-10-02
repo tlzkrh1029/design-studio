@@ -1,0 +1,88 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Agent.dc.html": {
+      "h": 1080,
+      "title": "5 · 에이전트형 분석",
+      "w": 1440,
+      "x": 0,
+      "y": 3080
+    },
+    "AlertDetail.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "2b · 예외 기반 알림: 알림 상세",
+      "w": 390,
+      "x": 1830,
+      "y": 0
+    },
+    "AlertRules.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "2c · 예외 기반 알림: 감시 규칙",
+      "w": 390,
+      "x": 2300,
+      "y": 0
+    },
+    "Alerts.dc.html": {
+      "h": 844,
+      "is_interactive": true,
+      "title": "2a · 예외 기반 알림: 알림 센터",
+      "w": 390,
+      "x": 1360,
+      "y": 0
+    },
+    "Chat.dc.html": {
+      "h": 1200,
+      "title": "4 · 대화형 분석",
+      "w": 1280,
+      "x": 1520,
+      "y": 1760
+    },
+    "Main.dc.html": {
+      "h": 1640,
+      "is_interactive": true,
+      "title": "1 · 판정형 브리핑",
+      "w": 1280,
+      "x": 0,
+      "y": 0
+    },
+    "MetricTree.dc.html": {
+      "h": 900,
+      "title": "3 · 지표 트리",
+      "w": 1440,
+      "x": 0,
+      "y": 1760
+    }
+  },
+  "createdOnFiles": {
+    "at": "2026-09-27T01:50:13Z",
+    "v": 1
+  },
+  "designSystems": [],
+  "launch": {
+    "view": "canvas"
+  },
+  "notes": {
+    "title": {
+      "kind": "title1",
+      "maxW": 2690,
+      "text": "대시보드 다음의 다섯 가지 형태",
+      "w": 240,
+      "x": 0,
+      "y": -300
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Alerts.dc.html",
+    "AlertDetail.dc.html",
+    "AlertRules.dc.html",
+    "MetricTree.dc.html",
+    "Chat.dc.html",
+    "Agent.dc.html"
+  ],
+  "pages": [],
+  "title": "대시보드 대안 시안 5종"
+}

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>감시 규칙</title>
+<!-- Preview generated from ../source/AlertRules.dc.html. The x-dc wrapper and the Design canvas runtime
+     script are removed so the board opens in any browser. Regenerate it after editing the source. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;family=Noto+Serif+KR:wght@600;700;900&amp;display=swap">
+<style>
+body{margin:0;background:#F6F3EC;color:#1A1916;font-family:'IBM Plex Sans KR','Noto Sans CJK KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;word-break:keep-all;overflow-wrap:break-word;-webkit-font-smoothing:antialiased}
+a{color:#1A1916}a:hover{color:#57534A}
+</style>
+</head>
+<body>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #F6F3EC; color: #1A1916; font-family: 'IBM Plex Sans KR', 'Noto Sans CJK KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; word-break: keep-all; overflow-wrap: break-word; display: flex; flex-direction: column">
+
+<main style="flex-grow: 1; box-sizing: border-box; padding: 24px 20px 12px; display: flex; flex-direction: column; gap: 14px">
+
+<div style="display: flex; justify-content: space-between; align-items: flex-end">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 12px; font-weight: 600; color: #57534A; letter-spacing: 0.06em">시장 감시 · 샘플 데이터</span>
+<h1 style="margin: 0; font-size: 26px; font-weight: 700">감시 규칙</h1>
+</div>
+<button type="button" aria-label="규칙 추가" style="width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid #B9B0A0; background: #FFFDF8; color: #1A1916; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg></button>
+</div>
+
+<p style="margin: 0; font-size: 13px; line-height: 1.6; color: #57534A">조건이 충족될 때만 푸시를 보냅니다. 값이 기준의 50%를 넘으면 ‘근접’으로 표시하고 아침 요약에만 넣습니다.</p>
+
+<section style="display: flex; flex-direction: column">
+<h2 style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: #57534A">푸시로 알리는 규칙</h2>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid #DCD5C6; align-items: start">
+<span style="font-size: 14px; font-weight: 700">국면 전환</span>
+<span style="justify-self: end; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid #B9B0A0; color: #57534A">조용함</span>
+<span style="font-size: 12px; line-height: 1.45; color: #57534A">판정 국면이 전날과 달라질 때</span>
+<span style="font-size: 12.5px; font-weight: 600; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums">C · 8일째</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid #DCD5C6; align-items: start">
+<span style="font-size: 14px; font-weight: 700">BTC.D 급락 (B 조기 경보)</span>
+<span style="justify-self: end; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #F4E27C; color: #1A1916">근접</span>
+<span style="font-size: 12px; line-height: 1.45; color: #57534A">1일 −0.5%p 또는 1주 −1.5%p 이상 하락하고, 그동안 BTCUSD가 오를 때</span>
+<span style="font-size: 12.5px; font-weight: 600; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums">−0.84%p · 56%</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid #DCD5C6; align-items: start">
+<span style="font-size: 14px; font-weight: 700">D/E 경계 (임시 기준)</span>
+<span style="justify-self: end; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid #B9B0A0; color: #57534A">조용함</span>
+<span style="font-size: 12px; line-height: 1.45; color: #57534A">ΣSTABLECOIN.D가 1개월 +1.0%p 이상 오르고, BTCUSD가 1개월 하락할 때</span>
+<span style="font-size: 12.5px; font-weight: 600; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums">−0.36%p</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid #DCD5C6; align-items: start">
+<span style="font-size: 14px; font-weight: 700">365선 갓 돌파</span>
+<span style="justify-self: end; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: #1A1916; color: #FFFDF8">발동</span>
+<span style="font-size: 12px; line-height: 1.45; color: #57534A">어제 마감한 봉이 365 SMA를 처음 넘고, 마감 dist가 10% 이하일 때</span>
+<span style="font-size: 12.5px; font-weight: 600; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums">2종</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid #DCD5C6; align-items: start">
+<span style="font-size: 14px; font-weight: 700">BTC 사이클선 교차</span>
+<span style="justify-self: end; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid #B9B0A0; color: #57534A">조용함</span>
+<span style="font-size: 12px; line-height: 1.45; color: #57534A">BTCUSD 일봉 종가가 365 SMA를 교차할 때</span>
+<span style="font-size: 12.5px; font-weight: 600; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums">−5.8%</span>
+</div>
+</section>
+
+<section style="display: flex; flex-direction: column">
+<h2 style="margin: 0 0 6px; font-size: 13px; font-weight: 700; color: #57534A">아침 요약에만 넣는 규칙</h2>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid #DCD5C6; align-items: start">
+<span style="font-size: 14px; font-weight: 700">IGV 동행 이탈 (주 1회)</span>
+<span style="justify-self: end; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid #B9B0A0; color: #57534A">조용함</span>
+<span style="font-size: 12px; line-height: 1.45; color: #57534A">IGV와 BTC의 21일 상관이 기준값 0.693에서 0.15 이상 벗어날 때</span>
+<span style="font-size: 12.5px; font-weight: 600; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums">0.66</span>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; padding: 10px 0; border-top: 1px solid #DCD5C6; align-items: start">
+<span style="font-size: 14px; font-weight: 700">관심 종목 언락 압력</span>
+<span style="justify-self: end; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid #B9B0A0; color: #57534A">조용함</span>
+<span style="font-size: 12px; line-height: 1.45; color: #57534A">7일 안에 시총 대비 5% 이상 언락이 예정될 때</span>
+<span style="font-size: 12.5px; font-weight: 600; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums">최대 2.1%</span>
+</div>
+</section>
+
+</main>
+
+<nav aria-label="하단 메뉴" style="flex-shrink: 0; height: 64px; box-sizing: border-box; border-top: 1px solid #DCD5C6; background: #FFFDF8; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr))">
+<a href="Main.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 44px; font-size: 11.5px; font-weight: 500; color: #57534A; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"></path><path d="M14 3v5h5"></path><path d="M9 13h7"></path><path d="M9 17h5"></path></svg>브리핑</a>
+<a href="Alerts.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 44px; font-size: 11.5px; font-weight: 500; color: #57534A; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2.5 8 2.5 8h-17S6 15 6 9z"></path><path d="M10 20.5a2.2 2.2 0 0 0 4 0"></path></svg>알림</a>
+<a href="AlertRules.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 44px; font-size: 11.5px; font-weight: 700; color: #1A1916; text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9"></path><path d="M17 7h3"></path><circle cx="15" cy="7" r="2"></circle><path d="M4 17h3"></path><path d="M11 17h9"></path><circle cx="9" cy="17" r="2"></circle></svg>규칙</a>
+</nav>
+
+</div>
+</body>
+</html>

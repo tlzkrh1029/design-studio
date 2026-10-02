@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>시안 A · VENUE 열</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Nanum+Gothic+Coding:wght@400;700&display=swap">
+<style>
+body{margin:0;background:#000;color:#e8e8e8;font-family:"IBM Plex Mono","Nanum Gothic Coding","Apple SD Gothic Neo","Malgun Gothic",ui-monospace,monospace;font-size:12px;line-height:1.45;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+a{color:#5ab4ff;text-decoration:none}a:hover{color:#8ecbff}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;border-radius:0}
+input{font:inherit}
+table{border-collapse:separate;border-spacing:0}
+th,td{padding:0}
+.thg{background:#141414;color:#ffa028;font-weight:700;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;text-align:center;padding:5px 6px 3px;border-bottom:1px solid #3f3f3f;white-space:nowrap}
+.th{background:#141414;color:#b4b4b4;font-weight:700;font-size:11px;text-align:center;padding:4px 5px;border-bottom:1px solid #2c2c2c;white-space:nowrap;letter-spacing:.03em}
+.td{padding:3px 4px;text-align:center;border-bottom:1px solid #2c2c2c;vertical-align:middle;background:#000}
+.sel .td{background:#0b2d7a}
+.cell{display:block;padding:5px 0;font-weight:700;font-size:12px;line-height:1.1}
+.na{display:block;padding:5px 0;color:#7c7c7c;font-size:12px;line-height:1.1;background:repeating-linear-gradient(135deg,transparent 0 3px,#2c2c2c 3px 4px)}
+.sp{display:block;margin:0 auto;overflow:visible}
+.ma{fill:none;stroke:#ffa028;stroke-width:1;stroke-dasharray:2 2.2;opacity:.85}
+.ln{fill:none;stroke:#e8e8e8;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}
+.ln.up{stroke:#2fd046;stroke-width:2}.ln.dn{stroke:#ff3b3b;stroke-width:2}
+.dot{stroke:#000;stroke-width:1.2}.dot.up{fill:#2fd046}.dot.dn{fill:#ff3b3b}
+.ring{fill:none;stroke-width:1.2;opacity:.6}.ring.up{stroke:#2fd046}.ring.dn{stroke:#ff3b3b}
+.q{display:inline-grid;grid-template-columns:7px 7px;gap:1.5px;vertical-align:-3px;margin-right:7px}
+.q i{display:block;width:7px;height:7px;background:#3f3f3f}
+.sg{display:block;white-space:nowrap;font-size:11.5px;color:#b4b4b4;line-height:1.4}
+.sg i{font-style:normal;display:inline-block;width:14px;color:#7c7c7c}
+.sg.hot i{color:#2fd046}.sg.dn i{color:#ff3b3b}
+.mi{color:#e8e8e8;font-size:12px;padding:2px 5px;white-space:nowrap}
+.mi b{color:#ffa028}
+.gb{font-size:11.5px;padding:2px 7px;color:#b4b4b4;border:1px solid transparent;white-space:nowrap}
+.gb b{color:#ffa028}
+.gb.on{background:#0b2d7a;color:#fff;border-color:#1444b8}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#141414;border-bottom:1px solid #2c2c2c;padding:4px 8px;min-height:30px;box-sizing:border-box}
+.pt{color:#ffa028;font-weight:700;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.pt small{color:#7c7c7c;font-weight:400;letter-spacing:.02em;text-transform:none;margin-left:8px;font-size:11px}
+.etf{display:block;width:100%;text-align:left;padding:2px 4px;line-height:1.3}
+.h th{color:#ffa028;font-weight:700;font-size:10.5px;letter-spacing:.08em;text-align:left;padding:5px 4px 4px;border-bottom:1px solid #3f3f3f;white-space:nowrap;text-transform:uppercase}
+.h td{padding:3px 4px;border-bottom:1px solid #2c2c2c;vertical-align:middle;font-size:11.5px}
+.r{text-align:right}
+.rk{color:#7c7c7c;width:18px}
+.sy{color:#fff;font-weight:700;white-space:nowrap}
+.nm{color:#b4b4b4;font-size:11px}
+.w{position:relative;width:66px;padding-left:10px;color:#fff}
+.bar{position:absolute;left:4px;top:5px;bottom:5px;background:rgba(255,160,40,.16)}
+.v{position:relative}
+.led{display:inline-grid;grid-template-columns:repeat(3,18px);gap:2px;vertical-align:middle}
+.led i{display:flex;align-items:center;justify-content:center;height:16px;font-style:normal;font-size:9.5px;font-weight:700;background:#161616;color:#4a4a4a;border:1px solid #2c2c2c;box-sizing:border-box}
+.led i.on{background:#ffa028;color:#000;border-color:#ffa028}
+.led i.unk{background:repeating-linear-gradient(135deg,#161616 0 3px,#2c2c2c 3px 4px);color:#8a8a8a}
+.st{display:flex;flex-direction:column;gap:1px;font-size:11px;line-height:1.3}
+.st b{color:#fff;font-size:13px}
+.st span{color:#7c7c7c;font-size:10.5px}
+</style>
+</helmet>
+<div style="width:1520px;height:740px;box-sizing:border-box;padding:0 16px;display:flex;flex-direction:column;background:#000;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:8px;border-bottom:1px solid #2c2c2c;padding:6px 0">
+    <span style="color:#ffa028;font-weight:700;font-size:14px;padding-left:4px">›</span>
+    <label for="cmdA" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">명령줄</label>
+    <input id="cmdA" type="text" value="SMH" style="flex-grow:1;background:#000;border:0;color:#ffa028;font-weight:600;font-size:13px;letter-spacing:.04em;padding:4px 6px;outline:0">
+    <button type="button" style="background:#1fbf4c;color:#000;font-weight:700;font-size:11.5px;letter-spacing:.06em;padding:5px 10px">&lt;GO&gt;</button>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px;background:#141414;border-bottom:1px solid #2c2c2c;padding:5px 8px">
+    <span style="background:#c0111f;color:#fff;font-weight:700;font-size:11px;letter-spacing:.1em;padding:2px 7px">SRM</span>
+    <span style="font-weight:700;color:#fff;font-size:13px">섹터 전환 매트릭스</span>
+    <span style="color:#2fd046;font-size:11.5px;flex-grow:1">SMH US Equity · 반도체 → 구성종목 표시</span>
+    <button type="button" class="mi"><b>97)</b> 색 규약: 초록=강세 (US) ▾</button>
+    <button type="button" class="mi"><b>98)</b> 도움말</button>
+    <span style="font-size:10.5px;letter-spacing:.08em;color:#ffa028;border:1px solid #8a5a1e;padding:1px 7px">SAMPLE · 상장 플래그는 예시</span>
+  </div>
+  <div style="display:flex;align-items:flex-end;gap:2px;border-bottom:1px solid #2c2c2c;padding-top:6px">
+    <button type="button" style="padding:6px 14px 5px;color:#fff;border-bottom:2px solid #ffa028;background:#141414;font-size:12.5px"><b style="color:#ffa028">1)</b> 매트릭스</button>
+    <button type="button" style="padding:6px 14px 5px;color:#b4b4b4;border-bottom:2px solid transparent;font-size:12.5px"><b style="color:#ffa028">2)</b> 도움말</button>
+    <span style="margin-left:auto;color:#7c7c7c;font-size:11.5px;padding:6px 4px"><b style="color:#ffa028">시안 A</b> · VENUE 열 (LED 3칸) · 관찰 대상 23 ETF · 구성종목 2026-09-26</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:10px;padding:10px 0 8px;flex-grow:1;align-items:start;min-height:0">
+    <div style="border:1px solid #2c2c2c;min-width:0">
+      <div class="ph">
+        <span class="pt">Sector Rotation Matrix<small>1주 · 1개월 · 3개월 · 6개월 · 12개월</small></span>
+        <div style="display:flex;gap:14px">
+          <span style="display:inline-flex;gap:2px"><button type="button" class="gb on"><b>11)</b> 전체 23</button><button type="button" class="gb"><b>12)</b> 섹터 11</button><button type="button" class="gb"><b>13)</b> 산업·테마 12</button></span>
+          <span style="display:inline-flex;gap:2px"><button type="button" class="gb on"><b>21)</b> 열 기준</button><button type="button" class="gb"><b>22)</b> 전환순</button></span>
+          <span style="display:inline-flex;gap:2px"><button type="button" class="gb"><b>31)</b> S</button><button type="button" class="gb"><b>32)</b> F</button><button type="button" class="gb"><b>33)</b> H</button></span>
+        </div>
+      </div>
+      <div style="overflow:hidden">
+        <table style="width:100%;font-size:12px">
+          <thead>
+            <tr>
+              <th class="thg" rowspan="2" style="text-align:left;width:160px;border-right:1px solid #2c2c2c">ETF</th>
+              <th class="thg" colspan="5">SPY 대비 상대수익률 백분위 (0~100)</th>
+              <th class="thg" colspan="2">가격 비율 12주 · 점선 = 이동평균</th>
+              <th class="thg" rowspan="2" style="text-align:left">RRG 국면</th>
+              <th class="thg" rowspan="2" style="width:70px">Venue</th>
+              <th class="thg" rowspan="2" style="text-align:left">신호</th>
+            </tr>
+            <tr>
+              <th class="th">1W</th>
+              <th class="th" style="color:#ffa028">1M<span style="display:inline-block;width:0;height:0;margin-left:4px;vertical-align:middle;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid #ffa028"></span></th>
+              <th class="th">3M</th>
+              <th class="th">6M</th>
+              <th class="th">12M</th>
+              <th class="th">vs QQQ</th>
+              <th class="th">vs SPY</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="sel">
+              <td class="td" style="text-align:left;border-right:1px solid #2c2c2c"><button type="button" class="etf"><span style="display:flex;align-items:baseline;gap:6px"><span style="color:#fff;font-weight:700;font-size:13px">SMH</span><span style="color:#7c7c7c;font-size:10.5px">US</span><span style="margin-left:auto;color:#ffa028;font-size:10px;letter-spacing:.1em">IND</span></span><span style="display:block;color:#dfe6ff;font-size:11.5px;white-space:nowrap">반도체</span></button></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(46,199,68);color:#000">100</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(46,199,68);color:#000">100</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(44,184,64);color:#000">95</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(31,66,36);color:#ededed">59</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(67,32,32);color:#ededed">43</span></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,14.3 11.2,15.3 19.4,16.7 27.5,17.9 35.7,19.9 43.9,21.6 52.1,22.2 60.3,21.7 68.5,20.3 76.6,17.9 84.8,14.4 93.0,10.3"></polyline><polyline class="ln" points="3.0,14.3 11.2,16.3 19.4,19.4 27.5,21.5 35.7,22.5 43.9,23.0 52.1,22.0 60.3,19.4 68.5,16.8 76.6,13.3 84.8,8.1 93.0,3.0"></polyline><circle class="dot up" cx="93.0" cy="3.0" r="2.8"></circle></svg></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,14.1 11.2,15.4 19.4,16.7 27.5,17.9 35.7,19.9 43.9,21.5 52.1,22.1 60.3,21.3 68.5,19.7 76.6,16.9 84.8,13.4 93.0,9.5"></polyline><polyline class="ln" points="3.0,14.1 11.2,16.7 19.4,19.3 27.5,21.5 35.7,22.3 43.9,23.0 52.1,21.5 60.3,18.6 68.5,15.6 76.6,11.9 84.8,7.4 93.0,3.0"></polyline><circle class="dot up" cx="93.0" cy="3.0" r="2.8"></circle></svg></td>
+              <td class="td" style="width:136px;text-align:left;white-space:nowrap;font-size:11.5px;letter-spacing:.05em;font-weight:700"><span class="q"><i style="background:#3d8bff"></i><i></i><i></i><i></i></span><span style="color:#3d8bff">IMPROVING</span> <span style="color:#7c7c7c;font-weight:400">→ <b style="color:#b4b4b4">LEADING</b></span></td>
+              <td class="td"><span class="led"><i>S</i><i class="on">F</i><i class="on">H</i></span></td>
+              <td class="td" style="text-align:left"><span class="sg hot"><i>★</i>SPY 대비 비율 상대 신고가</span><span class="sg hot"><i>↗</i>SPY 비율 200일선 상향 돌파</span></td>
+            </tr>
+            <tr>
+              <td class="td" style="text-align:left;border-right:1px solid #2c2c2c"><button type="button" class="etf"><span style="display:flex;align-items:baseline;gap:6px"><span style="color:#fff;font-weight:700;font-size:13px">DRAM</span><span style="color:#7c7c7c;font-size:10.5px">US</span><span style="margin-left:auto;color:#ffa028;font-size:10px;letter-spacing:.1em">THM</span></span><span style="display:block;color:#b4b4b4;font-size:11.5px;white-space:nowrap">메모리반도체</span></button></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(44,184,64);color:#000">95</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(44,184,64);color:#000">95</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(46,199,68);color:#000">100</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(43,172,61);color:#000">91</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="na">n/a</span></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,23.0 11.2,22.0 19.4,21.1 27.5,20.4 35.7,18.9 43.9,17.5 52.1,16.1 60.3,14.4 68.5,12.6 76.6,10.7 84.8,8.6 93.0,6.5"></polyline><polyline class="ln" points="3.0,23.0 11.2,20.9 19.4,19.4 27.5,18.4 35.7,16.8 43.9,15.3 52.1,13.8 60.3,11.7 68.5,9.7 76.6,7.6 84.8,5.6 93.0,3.0"></polyline><circle class="dot up" cx="93.0" cy="3.0" r="2.8"></circle></svg></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,23.0 11.2,22.1 19.4,21.2 27.5,20.5 35.7,18.8 43.9,17.2 52.1,15.8 60.3,14.0 68.5,12.1 76.6,10.2 84.8,8.1 93.0,6.0"></polyline><polyline class="ln" points="3.0,23.0 11.2,21.1 19.4,19.5 27.5,18.3 35.7,16.4 43.9,14.8 52.1,13.6 60.3,11.2 68.5,8.9 76.6,7.0 84.8,5.1 93.0,3.0"></polyline><circle class="dot up" cx="93.0" cy="3.0" r="2.8"></circle></svg></td>
+              <td class="td" style="width:136px;text-align:left;white-space:nowrap;font-size:11.5px;letter-spacing:.05em;font-weight:700"><span class="q"><i></i><i style="background:#2fd046"></i><i></i><i></i></span><span style="color:#2fd046">LEADING</span></td>
+              <td class="td"><span class="led"><i>S</i><i>F</i><i>H</i></span></td>
+              <td class="td" style="text-align:left"><span class="sg hot"><i>★</i>상장 후 최고 상대 순위</span></td>
+            </tr>
+            <tr>
+              <td class="td" style="text-align:left;border-right:1px solid #2c2c2c"><button type="button" class="etf"><span style="display:flex;align-items:baseline;gap:6px"><span style="color:#fff;font-weight:700;font-size:13px">XLK</span><span style="color:#7c7c7c;font-size:10.5px">US</span><span style="margin-left:auto;color:#ffa028;font-size:10px;letter-spacing:.1em">SECT</span></span><span style="display:block;color:#b4b4b4;font-size:11.5px;white-space:nowrap">기술</span></button></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(43,172,61);color:#000">91</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(43,172,61);color:#000">91</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(41,157,58);color:#000">86</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(33,85,40);color:#ededed">64</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(30,59,34);color:#ededed">57</span></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,14.8 11.2,14.4 19.4,14.8 27.5,14.8 35.7,14.6 43.9,14.8 52.1,14.4 60.3,13.9 68.5,13.7 76.6,13.0 84.8,12.3 93.0,11.6"></polyline><polyline class="ln" points="3.0,14.8 11.2,13.9 19.4,15.7 27.5,14.8 35.7,13.9 43.9,14.8 52.1,13.9 60.3,13.0 68.5,13.0 76.6,12.1 84.8,11.2 93.0,10.3"></polyline><circle class="dot up" cx="93.0" cy="10.3" r="2.8"></circle></svg></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,23.0 11.2,22.2 19.4,22.2 27.5,21.7 35.7,20.5 43.9,19.9 52.1,18.6 60.3,17.0 68.5,15.3 76.6,12.8 84.8,10.1 93.0,7.4"></polyline><polyline class="ln" points="3.0,23.0 11.2,21.5 19.4,22.2 27.5,19.9 35.7,18.4 43.9,19.2 52.1,16.8 60.3,13.8 68.5,11.5 76.6,9.2 84.8,6.1 93.0,3.0"></polyline><circle class="dot up" cx="93.0" cy="3.0" r="2.8"></circle></svg></td>
+              <td class="td" style="width:136px;text-align:left;white-space:nowrap;font-size:11.5px;letter-spacing:.05em;font-weight:700"><span class="q"><i style="background:#3d8bff"></i><i></i><i></i><i></i></span><span style="color:#3d8bff">IMPROVING</span></td>
+              <td class="td"><span class="led"><i class="on">S</i><i>F</i><i>H</i></span></td>
+              <td class="td" style="text-align:left"><span class="sg hot"><i>↗</i>SPY 비율 50일선 상향 돌파</span></td>
+            </tr>
+            <tr>
+              <td class="td" style="text-align:left;border-right:1px solid #2c2c2c"><button type="button" class="etf"><span style="display:flex;align-items:baseline;gap:6px"><span style="color:#fff;font-weight:700;font-size:13px">XLF</span><span style="color:#7c7c7c;font-size:10.5px">US</span><span style="margin-left:auto;color:#ffa028;font-size:10px;letter-spacing:.1em">SECT</span></span><span style="display:block;color:#b4b4b4;font-size:11.5px;white-space:nowrap">금융</span></button></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(57,30,30);color:#ededed">45</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(31,66,36);color:#ededed">59</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(36,115,48);color:#ededed">73</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(46,199,68);color:#000">100</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(46,199,68);color:#000">100</span></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,23.0 11.2,21.6 19.4,20.0 27.5,18.2 35.7,14.8 43.9,11.5 52.1,8.4 60.3,6.1 68.5,4.4 76.6,3.7 84.8,3.8 93.0,4.5"></polyline><polyline class="ln dn" points="3.0,23.0 11.2,20.1 19.4,16.9 27.5,12.8 35.7,9.5 43.9,6.7 52.1,4.6 60.3,3.4 68.5,3.0 76.6,3.8 84.8,5.0 93.0,6.3"></polyline><circle class="ring dn" cx="93.0" cy="6.3" r="5.5"></circle><circle class="dot dn" cx="93.0" cy="6.3" r="2.8"></circle></svg></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,23.0 11.2,21.2 19.4,19.4 27.5,17.6 35.7,14.0 43.9,10.7 52.1,7.8 60.3,5.7 68.5,4.2 76.6,3.6 84.8,3.6 93.0,4.0"></polyline><polyline class="ln dn" points="3.0,23.0 11.2,19.4 19.4,15.9 27.5,11.9 35.7,8.8 43.9,6.1 52.1,4.3 60.3,3.4 68.5,3.0 76.6,3.4 84.8,4.3 93.0,5.2"></polyline><circle class="ring dn" cx="93.0" cy="5.2" r="5.5"></circle><circle class="dot dn" cx="93.0" cy="5.2" r="2.8"></circle></svg></td>
+              <td class="td" style="width:136px;text-align:left;white-space:nowrap;font-size:11.5px;letter-spacing:.05em;font-weight:700"><span class="q"><i></i><i></i><i></i><i style="background:#ffd23f"></i></span><span style="color:#ffd23f">WEAKENING</span></td>
+              <td class="td"><span class="led"><i class="on">S</i><i class="on">F</i><i>H</i></span></td>
+              <td class="td" style="text-align:left"><span class="sg dn"><i>↓</i>순위 9계단 하락 (6개월 → 1개월)</span></td>
+            </tr>
+            <tr>
+              <td class="td" style="text-align:left;border-right:1px solid #2c2c2c"><button type="button" class="etf"><span style="display:flex;align-items:baseline;gap:6px"><span style="color:#fff;font-weight:700;font-size:13px">KRE</span><span style="color:#7c7c7c;font-size:10.5px">US</span><span style="margin-left:auto;color:#ffa028;font-size:10px;letter-spacing:.1em">IND</span></span><span style="display:block;color:#b4b4b4;font-size:11.5px;white-space:nowrap">지역은행</span></button></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(138,42,42);color:#ededed">27</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(100,37,37);color:#ededed">36</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(57,30,30);color:#ededed">45</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(36,115,48);color:#ededed">73</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(37,125,50);color:#ededed">76</span></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,23.0 11.2,20.9 19.4,18.6 27.5,16.2 35.7,11.8 43.9,8.0 52.1,5.3 60.3,4.2 68.5,4.7 76.6,6.6 84.8,9.7 93.0,13.0"></polyline><polyline class="ln dn" points="3.0,23.0 11.2,18.8 19.4,13.9 27.5,9.0 35.7,5.6 43.9,3.6 52.1,3.0 60.3,4.6 68.5,7.6 76.6,11.3 84.8,15.1 93.0,18.1"></polyline><circle class="ring dn" cx="93.0" cy="18.1" r="5.5"></circle><circle class="dot dn" cx="93.0" cy="18.1" r="2.8"></circle></svg></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,23.0 11.2,21.0 19.4,18.8 27.5,16.6 35.7,12.4 43.9,8.7 52.1,5.9 60.3,4.3 68.5,4.0 76.6,4.9 84.8,6.6 93.0,8.6"></polyline><polyline class="ln dn" points="3.0,23.0 11.2,19.0 19.4,14.4 27.5,9.9 35.7,6.4 43.9,4.1 52.1,3.0 60.3,3.6 68.5,5.3 76.6,7.6 84.8,9.9 93.0,11.6"></polyline><circle class="ring dn" cx="93.0" cy="11.6" r="5.5"></circle><circle class="dot dn" cx="93.0" cy="11.6" r="2.8"></circle></svg></td>
+              <td class="td" style="width:136px;text-align:left;white-space:nowrap;font-size:11.5px;letter-spacing:.05em;font-weight:700"><span class="q"><i></i><i></i><i></i><i style="background:#ffd23f"></i></span><span style="color:#ffd23f">WEAKENING</span></td>
+              <td class="td"><span class="led"><i>S</i><i>F</i><i>H</i></span></td>
+              <td class="td" style="text-align:left"><span class="sg dn"><i>↓</i>순위 10계단 하락 (6개월 → 1주)</span></td>
+            </tr>
+            <tr>
+              <td class="td" style="text-align:left;border-right:1px solid #2c2c2c"><button type="button" class="etf"><span style="display:flex;align-items:baseline;gap:6px"><span style="color:#fff;font-weight:700;font-size:13px">XBI</span><span style="color:#7c7c7c;font-size:10.5px">US</span><span style="margin-left:auto;color:#ffa028;font-size:10px;letter-spacing:.1em">IND</span></span><span style="display:block;color:#b4b4b4;font-size:11.5px;white-space:nowrap">바이오</span></button></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(36,115,48);color:#ededed">73</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(138,42,42);color:#ededed">27</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(210,52,52);color:#ededed">9</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(210,52,52);color:#ededed">9</span></td>
+              <td class="td" style="width:52px;padding:3px 2px"><span class="cell" style="background:rgb(225,55,55);color:#000">5</span></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,3.0 11.2,4.5 19.4,6.0 27.5,7.5 35.7,10.5 43.9,13.3 52.1,16.1 60.3,18.4 68.5,20.5 76.6,21.8 84.8,21.6 93.0,20.0"></polyline><polyline class="ln up" points="3.0,3.0 11.2,6.0 19.4,9.0 27.5,11.9 35.7,14.9 43.9,17.4 52.1,19.9 60.3,21.5 68.5,23.0 76.6,22.6 84.8,19.3 93.0,15.1"></polyline><circle class="ring up" cx="93.0" cy="15.1" r="5.5"></circle><circle class="dot up" cx="93.0" cy="15.1" r="2.8"></circle></svg></td>
+              <td class="td" style="width:100px"><svg class="sp" viewBox="0 0 96 26" width="96" height="26"><polyline class="ma" points="3.0,3.0 11.2,4.6 19.4,6.1 27.5,7.7 35.7,10.8 43.9,13.8 52.1,16.6 60.3,18.9 68.5,20.8 76.6,21.7 84.8,20.8 93.0,18.0"></polyline><polyline class="ln up" points="3.0,3.0 11.2,6.1 19.4,9.2 27.5,12.4 35.7,15.5 43.9,18.0 52.1,20.5 60.3,21.7 68.5,23.0 76.6,21.7 84.8,16.7 93.0,10.5"></polyline><circle class="ring up" cx="93.0" cy="10.5" r="5.5"></circle><circle class="dot up" cx="93.0" cy="10.5" r="2.8"></circle></svg></td>
+              <td class="td" style="width:136px;text-align:left;white-space:nowrap;font-size:11.5px;letter-spacing:.05em;font-weight:700"><span class="q"><i></i><i></i><i style="background:#ff3b3b"></i><i></i></span><span style="color:#ff3b3b">LAGGING</span></td>
+              <td class="td"><span class="led"><i>S</i><i>F</i><i class="unk">?</i></span></td>
+              <td class="td" style="text-align:left"><span class="sg"><i>≈</i>1주 반등, 1개월 이상에서는 미확인</span></td>
+            </tr>
+            <tr>
+              <td class="td" colspan="11" style="text-align:left;color:#7c7c7c;font-size:11px;padding:6px 8px;border-bottom:0">… 이하 17행은 시안에서 생략 (전체 23행 · 정렬 1M 백분위 높은 순)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin:0;padding:5px 8px;border-top:1px solid #2c2c2c;font-size:11.5px;color:#b4b4b4">SORT · <b style="color:#ffa028">1M 1개월</b> 백분위 높은 순 · VENUE 필터 없음 (31)~33) 또는 명령 <b style="color:#ffa028">VENUE H</b>)</p>
+      <p style="margin:0;padding:5px 8px 7px;font-size:11px;color:#7c7c7c;line-height:1.55"><b style="color:#b4b4b4">VENUE</b> · 세 칸은 왼쪽부터 <b style="color:#ffa028">S</b> bStocks(바이낸스 토큰화 현물) · <b style="color:#ffa028">F</b> 바이낸스 TradFi perp · <b style="color:#ffa028">H</b> 하이퍼리퀴드 TradFi perp 입니다. 주황으로 켜진 칸이 상장, 꺼진 칸이 미상장, 빗금 ?는 미확인입니다. 상장 여부는 예시이며 확인일 2026-09-27 기준으로 기록합니다.</p>
+    </div>
+
+    <div style="border:1px solid #2c2c2c;min-width:0">
+      <div class="ph">
+        <span class="pt">Holdings<small>구성종목 상위 10</small></span>
+        <span style="display:flex;gap:4px;align-items:center"><span style="color:#7c7c7c;font-size:11px;margin-right:6px">1 / 23</span><button type="button" style="font-size:11.5px;padding:2px 8px;color:#e8e8e8;border:1px solid #3f3f3f">‹ 이전</button><button type="button" style="font-size:11.5px;padding:2px 8px;color:#e8e8e8;border:1px solid #3f3f3f">다음 ›</button></span>
+      </div>
+      <div style="padding:8px 10px 10px;display:flex;flex-direction:column;gap:8px">
+        <div><div style="color:#ffa028;font-size:21px;font-weight:700;line-height:1.1">SMH<span style="font-size:11.5px;color:#8a5a1e;margin-left:7px;letter-spacing:.04em">US EQUITY</span></div><div style="color:#fff;font-size:12.5px;margin-top:3px">VanEck Semiconductor ETF</div><div style="color:#b4b4b4;font-size:11.5px">반도체 · 산업 ETF</div></div>
+        <div style="display:grid;grid-template-columns:max-content 1fr;gap:2px 12px;font-size:11.5px;border-top:1px solid #2c2c2c;border-bottom:1px solid #2c2c2c;padding:6px 0"><span style="color:#7c7c7c">순자산</span><span>$72.81B · 보유 26개 · 상위 10개 67.47%</span><span style="color:#7c7c7c">기준일</span><span>Sep 26, 2026 · <a href="https://stockanalysis.com/etf/smh/">stockanalysis.com</a></span><span style="color:#7c7c7c">ETF 상장</span><span style="display:flex;align-items:center;gap:8px"><span class="led"><i>S</i><i class="on">F</i><i class="on">H</i></span><span style="color:#b4b4b4">perp만 상장 (바이낸스·하이퍼리퀴드)</span></span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div class="st"><span><b style="color:#ffa028;font-size:10.5px;letter-spacing:.08em">S</b> bStocks</span><b>58.5%</b><span>8 / 10 종목 · 펀드 비중</span></div>
+          <div class="st"><span><b style="color:#ffa028;font-size:10.5px;letter-spacing:.08em">F</b> BN perp</span><b>40.3%</b><span>5 / 10 종목</span></div>
+          <div class="st"><span><b style="color:#ffa028;font-size:10.5px;letter-spacing:.08em">H</b> HL perp</span><b>35.3%</b><span>4 / 10 종목</span></div>
+        </div>
+        <table class="h" style="width:100%">
+          <thead><tr><th>#</th><th>티커</th><th>종목명</th><th class="r">비중</th><th style="text-align:center">Venue</th></tr></thead>
+          <tbody>
+            <tr><td class="rk">1</td><td class="sy">NVDA</td><td class="nm">NVIDIA Corporation</td><td class="w r"><span class="bar" style="width:100%"></span><span class="v">19.37%</span></td><td style="text-align:center"><span class="led"><i class="on">S</i><i class="on">F</i><i class="on">H</i></span></td></tr>
+            <tr><td class="rk">2</td><td class="sy">TSM</td><td class="nm">Taiwan Semiconductor</td><td class="w r"><span class="bar" style="width:47.3%"></span><span class="v">9.16%</span></td><td style="text-align:center"><span class="led"><i class="on">S</i><i>F</i><i>H</i></span></td></tr>
+            <tr><td class="rk">3</td><td class="sy">AMD</td><td class="nm">Advanced Micro Devices</td><td class="w r"><span class="bar" style="width:29.2%"></span><span class="v">5.66%</span></td><td style="text-align:center"><span class="led"><i class="on">S</i><i class="on">F</i><i class="on">H</i></span></td></tr>
+            <tr><td class="rk">4</td><td class="sy">AVGO</td><td class="nm">Broadcom Inc.</td><td class="w r"><span class="bar" style="width:27.5%"></span><span class="v">5.32%</span></td><td style="text-align:center"><span class="led"><i class="on">S</i><i class="on">F</i><i class="on">H</i></span></td></tr>
+            <tr><td class="rk">5</td><td class="sy">MU</td><td class="nm">Micron Technology</td><td class="w r"><span class="bar" style="width:25.9%"></span><span class="v">5.01%</span></td><td style="text-align:center"><span class="led"><i class="on">S</i><i class="on">F</i><i>H</i></span></td></tr>
+            <tr><td class="rk">6</td><td class="sy">INTC</td><td class="nm">Intel Corporation</td><td class="w r"><span class="bar" style="width:25.7%"></span><span class="v">4.98%</span></td><td style="text-align:center"><span class="led"><i class="on">S</i><i class="on">F</i><i class="on">H</i></span></td></tr>
+            <tr><td class="rk">7</td><td class="sy">SKHY</td><td class="nm">SK hynix Inc.</td><td class="w r"><span class="bar" style="width:23.6%"></span><span class="v">4.58%</span></td><td style="text-align:center"><span class="led"><i>S</i><i>F</i><i>H</i></span></td></tr>
+            <tr><td class="rk">8</td><td class="sy">TXN</td><td class="nm">Texas Instruments</td><td class="w r"><span class="bar" style="width:23.2%"></span><span class="v">4.49%</span></td><td style="text-align:center"><span class="led"><i class="on">S</i><i>F</i><i>H</i></span></td></tr>
+            <tr><td class="rk">9</td><td class="sy">MRVL</td><td class="nm">Marvell Technology</td><td class="w r"><span class="bar" style="width:23.1%"></span><span class="v">4.47%</span></td><td style="text-align:center"><span class="led"><i class="on">S</i><i>F</i><i>H</i></span></td></tr>
+            <tr><td class="rk">10</td><td class="sy">KLAC</td><td class="nm">KLA Corporation</td><td class="w r"><span class="bar" style="width:22.9%"></span><span class="v">4.43%</span></td><td style="text-align:center"><span class="led"><i>S</i><i>F</i><i>H</i></span></td></tr>
+          </tbody>
+        </table>
+        <p style="margin:0;font-size:10.5px;color:#7c7c7c;line-height:1.5">커버리지는 상위 10개 구성종목 가운데 그 상품으로 살 수 있는 종목의 펀드 비중 합계입니다. 상장 여부는 예시 데이터이고, '최근 변동' 열은 스냅샷을 두 번 저장한 뒤 이 표 오른쪽에 추가됩니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;gap:18px;background:#141414;border-top:1px solid #2c2c2c;padding:5px 8px;font-size:11px;color:#7c7c7c">
+    <span><b style="color:#b4b4b4">SRM</b> 섹터 전환 터미널 · 상장 플래그 S/F/H는 예시 · 구성종목 stockanalysis.com 2026-09-26</span>
+    <span>←/→ 이전·다음 ETF · ESC 닫기<span style="color:#ffa028;margin-left:16px">2026-09-27 17:30:00 KST · NY 04:30<span style="margin-left:10px;letter-spacing:.06em;color:#7c7c7c">NYSE CLOSED</span></span></span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1520,"height":740}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>
