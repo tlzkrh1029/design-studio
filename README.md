@@ -7,7 +7,7 @@
 | 폴더 | 작업 | 지금 상태 | 먼저 읽을 문서 |
 | --- | --- | --- | --- |
 | [book-design/](book-design/) | 서고의 표지와 페이지('크립토 브리핑 서고', '국채 및 경제 매크로 서고') | 크립토 브리핑 서고의 7번째 판(밤의 가판대 테마)이 게시되어 있습니다. | [HANDOFF.md](book-design/HANDOFF.md) |
-| [dashboard-design/](dashboard-design/) | 미국 섹터 모니터링 화면(섹터 전환 매트릭스, 거래소 상장 표시, 돌파 지도) | 블룸버그 터미널 같은 스타일로 방향을 정했습니다. | [HANDOFF.md](dashboard-design/HANDOFF.md) |
+| [dashboard-design/](dashboard-design/) | 미국 섹터 모니터링 화면(섹터 전환 매트릭스, 거래소 상장 표시, 돌파 지도) | 블룸버그 터미널 스타일을 스타일 사례 하나로 정리했습니다. 기준선은 아직 정하지 않았습니다. | [HANDOFF.md](dashboard-design/HANDOFF.md) |
 
 ## 폴더 안내
 
@@ -23,7 +23,7 @@ design-studio/
 └── dashboard-design/     작업 2: 미국 섹터 모니터링 화면
     ├── HANDOFF.md        인계 문서
     ├── AGENTS.md         이 작업에만 해당하는 규칙
-    └── bloomberg-style/  블룸버그 터미널 같은 스타일의 참고 이미지
+    └── bloomberg-style/  스타일 사례: 블룸버그 터미널 스타일
 ```
 
 ## 이어받는 방법
