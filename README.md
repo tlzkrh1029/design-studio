@@ -28,7 +28,7 @@ design-studio/
 
 ## 이어받는 방법
 
-1. [AGENTS.md](AGENTS.md)와 [디자인_원칙.md](디자인_원칙.md)를 읽습니다.
+1. [AGENTS.md](AGENTS.md)와 [디자인_원칙.md](디자인_원칙.md)를 읽습니다. Claude와 GPT가 번갈아 일하는 방법은 AGENTS.md의 '인계 규칙'에 있습니다.
 2. 맡은 작업 폴더의 HANDOFF.md와 AGENTS.md를 읽습니다. 작업 폴더의 AGENTS.md와 맨 위의 AGENTS.md가 서로 다르면 작업 폴더의 규칙을 따릅니다.
 3. 지금 상태와 사용자가 고른 것, 지켜야 할 규칙을 짧게 정리한 뒤 사용자의 지시를 기다립니다.
 
