@@ -1,6 +1,6 @@
-# drafts: 섹터 모니터링 화면의 시안 원본
+# drafts: 블룸버그 스타일 크립토 대시보드의 시안 원본
 
-이 폴더에는 Claude 아티팩트로 만든 시안 가운데 사용자가 고른 네 개의 원본을 둡니다. 원래 아티팩트는 소유자만 열 수 있는 비공개 링크이므로, 다른 AI와 사람은 이 폴더의 파일로 시안을 봅니다. 내보내기 규칙은 저장소 맨 위 [AGENTS.md](../../AGENTS.md)의 '시안 내보내기' 절에 있습니다.
+이 폴더에는 Claude 아티팩트로 만든 시안 가운데 사용자가 고른 네 개의 원본을 둡니다. 원래 아티팩트는 소유자만 열 수 있는 비공개 링크이므로, 다른 AI와 사람은 이 폴더의 파일로 시안을 봅니다. 내보내기 규칙은 저장소 맨 위 [AGENTS.md](../../../AGENTS.md)의 '시안 내보내기' 절에 있습니다.
 
 | 시안 | 여는 파일 | 원래 아티팩트 | 아티팩트 마지막 수정 | 내보낸 날짜 |
 | --- | --- | --- | --- | --- |
@@ -9,7 +9,9 @@
 | 돌파 장부 | [breakout-ledger/index.html](breakout-ledger/index.html) | [GAHGNoGtA86SW1eiWBahft](https://claude.ai/artifact/GAHGNoGtA86SW1eiWBahft) | 2026-09-27 | 2026-10-03 |
 | 돌파 벽 | [breakout-wall/index.html](breakout-wall/index.html) | [6xTRHAErUfaFX579aDCtCS](https://claude.ai/artifact/6xTRHAErUfaFX579aDCtCS) | 2026-09-27 | 2026-10-03 |
 
-네 시안 모두 블룸버그 터미널 같은 스타일로 만든 화면입니다. 이 스타일은 이 작업의 여러 디자인 스타일 가운데 하나의 사례이며, 기준선이 아닙니다([bloomberg-style/](../bloomberg-style/README.md) 참고).
+네 시안 모두 블룸버그 터미널 같은 스타일로 만든 미국 섹터 모니터링 화면이며, 작업 3(미국 증시·크립토 모니터링 화면)의 하위 개념인 블룸버그 스타일 크립토 대시보드에 속합니다. 스타일 설명과 사례 캡처는 상위 폴더의 [README.md](../README.md)에 있습니다.
+
+네 시안은 2026년 10월 3일에 `dashboard-design/drafts/`로 내보냈다가, 10월 5일에 사용자의 결정에 따라 작업과 함께 이 폴더(`crypto-dashboard-design/bloomberg-style/drafts/`)로 옮겼습니다. 옮기면서 파일의 내용은 바꾸지 않았습니다.
 
 ## 여는 방법
 
@@ -37,11 +39,11 @@
 
 - 섹터 전환 터미널, 돌파 장부, 돌파 벽은 데스크톱(1440×900)과 모바일(390×844) 폭에서, 거래소 상장 표시 시안의 보드는 보드 크기(1520×740)에서 열었습니다. 스크립트 오류는 없었습니다.
 - 점검 환경에서는 Google Fonts에 접속할 수 없어서, 같은 글꼴을 npm의 @fontsource 패키지에서 받아 적용한 뒤 확인했습니다.
-- 원본에 있는 다음 문제는 내보내면서 고치지 않았습니다. 고칠지는 사용자가 정합니다([HANDOFF.md](../HANDOFF.md) 4절).
+- 원본에 있는 다음 문제는 내보내면서 고치지 않았습니다. 고칠지는 사용자가 정합니다([HANDOFF.md](../../HANDOFF.md) 4절).
   - 섹터 전환 터미널: 모바일 폭(390px)에서 매트릭스 제목 줄('SECTOR ROTATION MATRIX'와 기간 표시)이 줄바꿈되지 않아, 화면이 가로로 15px 넘칩니다.
   - 거래소 상장 표시 시안: 세 보드 모두 높이가 740px로 고정되어 있어, 넘친 내용이 아래쪽에서 잘립니다(시안 A 47px, B 111px, C 21px). 시안 B에서는 오른쪽 구성종목 표의 9번째 줄이 아래쪽 상태 표시줄과 겹칩니다.
 
 ## 내보내지 않은 시안
 
-- 섹터 전환 매트릭스 v2와 v3, 돌파 지도(시안 v6)는 사용자가 내보내지 않기로 정했습니다(2026-10-02). 돌파 지도(시안 v6)의 화면 캡처는 [bloomberg-style/](../bloomberg-style/README.md)에 있습니다.
-- 대시보드 대안 시안 5종은 내용이 크립토 시장 화면이어서 작업 3으로 옮겼고, [crypto-dashboard-design/drafts/](../../crypto-dashboard-design/drafts/README.md)로 내보냈습니다.
+- 섹터 전환 매트릭스 v2와 v3, 돌파 지도(시안 v6)는 사용자가 내보내지 않기로 정했습니다(2026-10-02). 돌파 지도(시안 v6)의 화면 캡처는 상위 폴더([bloomberg-style/](../README.md))에 있습니다.
+- 대시보드 대안 시안 5종은 작업 2에서 다루며, 원본은 [artifact-design/drafts/](../../../artifact-design/drafts/README.md)에 있습니다.
