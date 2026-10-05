@@ -7,7 +7,7 @@
 | 폴더 | 작업 | 지금 상태 | 먼저 읽을 문서 |
 | --- | --- | --- | --- |
 | [book-design/](book-design/) | 서고의 표지와 페이지('크립토 브리핑 서고', '국채 및 경제 매크로 서고') | 크립토 브리핑 서고의 7번째 판(밤의 가판대 테마)이 게시되어 있습니다. | [HANDOFF.md](book-design/HANDOFF.md) |
-| [artifact-design/](artifact-design/) | 아티팩트의 디자인과 스타일. 대시보드에 한정하지 않으며, 대시보드 대안 시안 5종(판정형 브리핑, 예외 기반 알림, 지표 트리, 대화형 분석, 에이전트형 분석)에서 출발합니다. | 시안 하나의 원본이 `drafts/`에 있습니다. 시안 속 크립토 내용은 예시이며, 이 작업은 디자인과 스타일만 다룹니다. 기준선은 아직 정하지 않았습니다. | [HANDOFF.md](artifact-design/HANDOFF.md) |
+| [artifact-design/](artifact-design/) | 아티팩트의 디자인과 스타일. 대시보드에 한정하지 않으며, 대시보드 대안 시안 5종(판정형 브리핑, 예외 기반 알림, 지표 트리, 대화형 분석, 에이전트형 분석)에서 출발합니다. | 시안 두 개의 원본이 `drafts/`에 있고, 위치 지도와 거리 막대 패턴이 `patterns/location-map/`에 있습니다. 대시보드 대안 시안 속 크립토 내용은 예시이며, 이 작업은 디자인과 스타일만 다룹니다. 기준선은 아직 정하지 않았습니다. | [HANDOFF.md](artifact-design/HANDOFF.md) |
 | [crypto-dashboard-design/](crypto-dashboard-design/) | 미국 증시·크립토 모니터링 화면. 지금은 미국 섹터 모니터링 화면(섹터 전환 매트릭스, 거래소 상장 표시, 돌파 지도)을 다루며, 하위 개념인 블룸버그 스타일 크립토 대시보드를 `bloomberg-style/`에 둡니다. | 블룸버그 스타일 시안 네 개의 원본과 사례 캡처 두 장이 `bloomberg-style/`에 있습니다. 기준선은 아직 정하지 않았습니다. | [HANDOFF.md](crypto-dashboard-design/HANDOFF.md) |
 
 ## 폴더 안내
@@ -24,7 +24,8 @@ design-studio/
 ├── artifact-design/          작업 2: 아티팩트의 디자인과 스타일(내용은 예시)
 │   ├── HANDOFF.md            인계 문서
 │   ├── AGENTS.md             이 작업에만 해당하는 규칙
-│   └── drafts/               시안 원본: 대시보드 대안 시안 5종
+│   ├── patterns/             다시 쓰는 디자인: 위치 지도와 거리 막대(location-map)
+│   └── drafts/               시안 원본: 대시보드 대안 시안 5종, 상권 지도 시안
 └── crypto-dashboard-design/  작업 3: 미국 증시·크립토 모니터링 화면
     ├── HANDOFF.md            인계 문서(섹터 모니터링 인계 브리프 포함)
     ├── AGENTS.md             이 작업에만 해당하는 규칙
@@ -58,6 +59,7 @@ https://github.com/tlzkrh1029/design-studio 저장소의 <폴더> 작업을 이�
 - 2026-10-02: `dashboard-design/` 폴더를 만들고, 섹터 모니터링 인계 브리프의 내용을 HANDOFF.md로 옮겼습니다.
 - 2026-10-03: 사용자가 고른 시안 다섯 개의 원본을 저장소로 내보냈습니다. 섹터 모니터링 화면의 시안 네 개는 `dashboard-design/drafts/`에 두었습니다. 크립토 시장 화면의 시안 하나는 새 작업 `crypto-dashboard-design/`(작업 3)으로 나누고, 그 폴더의 `drafts/`에 두었습니다.
 - 2026-10-05: 사용자의 결정에 따라 두 작업 폴더의 내용을 맞바꿨습니다. 대시보드 대안 시안 5종은 `dashboard-design/`으로 옮긴 뒤 폴더 이름을 `artifact-design/`으로 바꿨고, 이 작업은 아티팩트의 디자인과 스타일을 다룹니다(시안 속 크립토 내용은 예시입니다). 섹터 모니터링 작업은 `crypto-dashboard-design/`으로 옮겨 '미국 증시·크립토 모니터링 화면'으로 정의했고, 하위 개념인 블룸버그 스타일 크립토 대시보드는 그 시안 네 개와 함께 `bloomberg-style/`에 모았습니다.
+- 2026-10-05: '건대스타시티점 브리핑'의 상권 지도를 다시 디자인하면서 `artifact-design/patterns/location-map/`(위치 지도와 거리 막대)을 만들고, 비교한 시안을 `artifact-design/drafts/location-map-drafts/`로 내보냈습니다. 같은 날 디자인 원칙 8(지도)을 더했습니다.
 
 ## 공개 범위
 
