@@ -11,6 +11,8 @@
 
 상권 지도 시안은 '건대스타시티점 브리핑'의 상권 지도를 다시 디자인하면서 만든 비교 페이지입니다. 화면의 수치는 예시가 아니라 보도와 업계 집계에서 가져온 실제 값입니다. 사용자는 이 가운데 시안 A와 B를 함께 쓰기로 했고, 채택한 안의 규칙과 참조 구현은 [../patterns/location-map/](../patterns/location-map/README.md)에 있습니다. 브리핑 전체는 저장소에 올리지 않았습니다.
 
+사이트 대문('WMA 3:10 Crypto Screener')을 고르면서 비교한 시안 여덟 개는 이 폴더로 내보내지 않았습니다. 시안을 아티팩트로 게시하지 않고 대화 안에 렌더링한 화면으로만 비교했고, 시안에 은어로 바꾸기 전의 평문이 들어 있어서 시안이 은어의 해설 구실을 하기 때문입니다([../HANDOFF.md](../HANDOFF.md) 1절, [../AGENTS.md](../AGENTS.md)의 '은어의 해설'). 채택한 대문의 아티팩트(https://claude.ai/artifact/H3Xryr2EQ3YYy9FFtqiBy7, 마지막 수정 2026-10-11)는 2026년 10월 13일에 이 폴더가 아니라 [../patterns/site-launcher/reference.html](../patterns/site-launcher/reference.html)로 내보냈습니다. 원래 코드의 주석과 이름 가운데 일부가 은어의 뜻을 드러내서, 그 부분을 바꿔 내보냈습니다(바꾼 내용은 [../patterns/site-launcher/README.md](../patterns/site-launcher/README.md)의 파일 표에 있습니다).
+
 ## 여는 방법
 
 - GitHub 웹 화면에서는 HTML 파일이 코드로만 보입니다. 저장소를 내려받은 뒤(Code → Download ZIP) '여는 파일'을 브라우저로 엽니다.
