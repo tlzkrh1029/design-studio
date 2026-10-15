@@ -1,0 +1,7 @@
+{
+ "map": {
+  "P1": "A",
+  "P2": "B"
+ },
+ "note": "P# -> variant; kept outside judge/ so the judge cannot see it"
+}
