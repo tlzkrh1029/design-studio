@@ -1,6 +1,6 @@
 # agents: 하위 작업 지시문과 보고
 
-작업 중에 Claude가 하위 에이전트 37개에게 나눠 맡긴 일의 기록입니다. 파일마다 Claude가 쓴 지시문과 하위 에이전트가 돌려준 최종 보고를 원문 그대로 담았습니다. 지시문은 영어로 썼고, 보고는 지시에 따라 한국어나 영어로 돌아왔습니다. 대화 전체 기록은 넣지 않았습니다.
+작업 중에 Claude가 하위 에이전트 38개에게 나눠 맡긴 일의 기록입니다. 파일마다 Claude가 쓴 지시문과 하위 에이전트가 돌려준 최종 보고를 원문 그대로 담았습니다. 지시문은 영어로 썼고, 보고는 지시에 따라 한국어나 영어로 돌아왔습니다. 대화 전체 기록은 넣지 않았습니다.
 
 하위 에이전트를 쓴 이유는 세 가지입니다.
 
@@ -47,6 +47,7 @@
 | 35 | 10-01 11:49 | 2차 실험 | 편집국 1면 · 블라인드 평가 (평가자 B) | [35_blind_judge_paper_pages_b.md](35_blind_judge_paper_pages_b.md) |
 | 36 | 10-01 11:49 | 2차 실험 | 달력 벽 · 블라인드 평가 (평가자 A) | [36_blind_judge_calendar_pages_a.md](36_blind_judge_calendar_pages_a.md) |
 | 37 | 10-01 11:49 | 2차 실험 | 달력 벽 · 블라인드 평가 (평가자 B) | [37_blind_judge_calendar_pages_b.md](37_blind_judge_calendar_pages_b.md) |
+| 38 | 10-15 12:31 무렵 | 열람 창 시안 | 서고 열람 창 · 블라인드 평가 | [38_blind_judge_issue_viewer.md](38_blind_judge_issue_viewer.md) |
 
 ## 함께 보면 좋은 파일
 
@@ -59,3 +60,4 @@
 | 17~22 2차 명세 작성 | `cover_design/experiment2/brief_*.md`, `originals/` | `experiment2/specs/*.md`, `*.xml` |
 | 23~31 2차 구현 | `experiment2/IMPLEMENT.md`, 자기 명세(명세 없이 조건은 브리프와 원래 시안) | `experiment2/<테마>_<조건>.src.html`, `notes/*_xml.md` |
 | 32~37 블라인드 평가 | `cover_design/judge/<테마>_<A,B>/brief.md`와 페이지 캡처 | `judge/<테마>_<A,B>/scores.json` |
+| 38 열람 창 블라인드 평가 | `iterations/2026-10-15_issue-viewer/judge/brief.md`와 창 캡처 | `iterations/2026-10-15_issue-viewer/judge/scores.json` |
