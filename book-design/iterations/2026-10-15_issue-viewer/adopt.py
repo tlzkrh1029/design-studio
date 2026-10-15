@@ -3,7 +3,8 @@
 The owner chose variant B on 2026-10-15 at 14:35 ("시안 b로 가자. 착수하자."). Variant A's styles and markup and
 the A/B switch (<html data-vw>, the 'vw-variant' event) are removed; B's rules move from `.vw-b .x` to `.vw .x`,
 which keeps their specificity, so the page renders exactly like preview_b.html. The headline fit is kept as is.
-Run patch.py first; build.py then makes preview_adopted.html for the comparison.
+Run patch.py first; build.py then makes preview_adopted.html for the comparison. The last step (2026-10-16) turns
+the viewer openers into buttons, because claude.ai's artifact frame opens link clicks itself.
 """
 import os
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -88,6 +89,49 @@ rep('''  if(MODE.narrow) fitHl(h,null,0);
 rep('''  var keep='.hcover,.vw-cv,.htext,.vw-tx,.vw-step,.vw-x';''', '''  var keep='.vw-cv,.vw-tx,.vw-step,.vw-x';''')
 rep('''document.addEventListener('vw-variant',function(){ var b=VW.id&&byId(VW.id); if(b) vwRender(b,false); });
 ''', '')
+
+# ---- after the live check on 2026-10-16: the viewer openers are buttons, not links
+# claude.ai's artifact frame is sandboxed without allow-popups, so the frame opens every link click itself, and a
+# link that the page wanted to turn into "open the viewer" could still open the brief. The rack covers and the
+# timeline days now carry no href (role="button"; Enter and Space open the viewer). The hero cover, the list,
+# the search results and the viewer's own 'brief' button stay links.
+rep("""a.slot:focus-visible{outline-offset:6px}
+""", """a.slot:focus-visible{outline-offset:6px}
+.slot[data-id],.tc[data-id]{cursor:pointer}
+""")
+rep("""    return b.url?'<a class="'+cls+'"'+ext(b.url)+' data-id="'+esc(b.id)+'" tabindex="'+(lat?0:-1)+'" aria-label="'+esc(lab+', 표지 크게 보기')+'" data-t1="'+esc(t1)+'" data-t2="'+esc(t2)+'"><span class="face">'+face+'</span>'+mo+'</a>'
+      :'<span class="'+cls+'" role="img" aria-label="'+esc(lab)+'" data-t1="'+esc(t1)+'" data-t2="'+esc(t2)+'"><span class="face">'+face+'</span>'+mo+'</span>';""",
+    """    return '<a class="'+cls+'" role="button" data-id="'+esc(b.id)+'" tabindex="'+(lat?0:-1)+'" aria-label="'+esc(lab+', 표지 크게 보기')+'" data-t1="'+esc(t1)+'" data-t2="'+esc(t2)+'"><span class="face">'+face+'</span>'+mo+'</a>';""")
+rep("""  var b=s.b, t=b.url?'a':'div';
+  return '<'+t+' class="slot"'+(b.url?ext(b.url)+' data-id="'+esc(b.id)+'"':' role="img"')+' aria-label="'+esc(coverLabel(b,b.url?'표지 크게 보기':''))+'"><span class="sglow" aria-hidden="true"></span>'""",
+    """  var b=s.b, t='a';
+  return '<a class="slot" role="button" tabindex="0" data-id="'+esc(b.id)+'" aria-label="'+esc(coverLabel(b,'표지 크게 보기'))+'"><span class="sglow" aria-hidden="true"></span>'""")
+rep("""/* A rack cover or a timeline day opens that issue over the page. A click with a modifier key, or the middle
+   button, still follows the link and opens the brief. Esc, the close button or a click beside the issue closes
+   it; the arrow buttons and the left/right keys move to the previous or next issue in publishing order. */""",
+    """/* A rack cover or a timeline day opens that issue over the page. They are buttons, not links: the artifact
+   frame opens links on its own (it may not open windows itself), so a link here could open the brief before the
+   page can stop it. Esc, the close button or a click beside the issue closes it; the arrow buttons and the
+   left/right keys move to the previous or next issue in publishing order. */""")
+rep("""function vwFromLink(e){
+  if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
+  var a=e.target.closest('[data-id]'); if(!a||!e.currentTarget.contains(a)) return;
+  var b=byId(a.getAttribute('data-id')); if(!b) return;
+  e.preventDefault(); vwOpen(b,a);
+}""", """function vwFromLink(e){
+  if(e.defaultPrevented||e.button!==0) return;
+  var a=e.target.closest('[data-id]'); if(!a||!e.currentTarget.contains(a)) return;
+  var b=byId(a.getAttribute('data-id')); if(!b) return;
+  e.preventDefault(); vwOpen(b,a);
+}
+function vwKeyOpen(e){
+  if(e.key!=='Enter'&&e.key!==' ') return;
+  var a=e.target.closest&&e.target.closest('[data-id]'); if(!a||!e.currentTarget.contains(a)) return;
+  var b=byId(a.getAttribute('data-id')); if(!b) return;
+  e.preventDefault(); vwOpen(b,a);
+}""")
+rep("""  [$('#rack'),tl].forEach(function(el){ if(el) el.addEventListener('click',vwFromLink); });""",
+    """  [$('#rack'),tl].forEach(function(el){ if(el){ el.addEventListener('click',vwFromLink); el.addEventListener('keydown',vwKeyOpen); } });""")
 
 import re
 for gone in [r'\bvw-[ab]\b', r'VW\.v\b', 'data-vw', 'vw-cord', 'vw-stage', 'vwVariant', 'vw-variant']:

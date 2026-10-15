@@ -313,6 +313,7 @@ a.tc:hover{box-shadow:0 0 0 1px var(--t2)}
 .rslots{position:relative;display:grid;grid-template-columns:repeat(var(--rn),var(--rack-w));column-gap:var(--rg)}
 .slot{position:relative;display:block;width:var(--rack-w);border-radius:2px}
 a.slot:focus-visible{outline-offset:6px}
+.slot[data-id],.tc[data-id]{cursor:pointer}
 .slot .cv{position:relative;z-index:1;width:var(--rack-w);box-shadow:var(--sh-cover-rack);transition:transform var(--ease),box-shadow var(--ease)}
 .slot .sglow{position:absolute;left:50%;top:calc(var(--rack-h) - 3.5px);width:160px;height:10px;margin-left:-80px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 30%,transparent),transparent);opacity:0;transition:opacity var(--ease);pointer-events:none}
 a.slot:hover .cv{transform:translateY(-6px);box-shadow:var(--sh-cover-rack-hover)}
@@ -2058,8 +2059,7 @@ function phases(){
     var lab=kDay(d)+' '+wdF(d)+', '+phSpoken(b.phase)+(c>1?', '+c+'회 발행 중 마지막 회차':'');
     var t1=ps.length?(ps.length>1?'국면 '+ps.join('→'):phName(b.phase)):'판정 없음';
     var t2=kDay(d)+' '+wdF(d)+(c>1?' · '+c+'회 발행, 마지막 회차 판정':'');
-    return b.url?'<a class="'+cls+'"'+ext(b.url)+' data-id="'+esc(b.id)+'" tabindex="'+(lat?0:-1)+'" aria-label="'+esc(lab+', 표지 크게 보기')+'" data-t1="'+esc(t1)+'" data-t2="'+esc(t2)+'"><span class="face">'+face+'</span>'+mo+'</a>'
-      :'<span class="'+cls+'" role="img" aria-label="'+esc(lab)+'" data-t1="'+esc(t1)+'" data-t2="'+esc(t2)+'"><span class="face">'+face+'</span>'+mo+'</span>';
+    return '<a class="'+cls+'" role="button" data-id="'+esc(b.id)+'" tabindex="'+(lat?0:-1)+'" aria-label="'+esc(lab+', 표지 크게 보기')+'" data-t1="'+esc(t1)+'" data-t2="'+esc(t2)+'"><span class="face">'+face+'</span>'+mo+'</a>';
   }).join('');
   var nums=days.map(function(d){return '<span'+(d===L.date?' class="latest"':'')+'>'+ymd(d).d+'</span>';}).join('');
   var sp=['C','D'];
@@ -2081,8 +2081,8 @@ function phases(){
 function slotHTML(s){
   if(s.empty) return '<div class="slot empty" role="img" aria-label="'+kDay(s.d)+' '+wdF(s.d)+', 브리핑 없음"><div class="ebox">'+dash(0,'4 4')+'<span>브리핑 없음</span></div>'
     +'<div class="lab"><div class="l1"><span class="d">'+mdot(s.d)+'</span><span class="w">'+wd(s.d)+'</span></div></div></div>';
-  var b=s.b, t=b.url?'a':'div';
-  return '<'+t+' class="slot"'+(b.url?ext(b.url)+' data-id="'+esc(b.id)+'"':' role="img"')+' aria-label="'+esc(coverLabel(b,b.url?'표지 크게 보기':''))+'"><span class="sglow" aria-hidden="true"></span>'
+  var b=s.b, t='a';
+  return '<a class="slot" role="button" tabindex="0" data-id="'+esc(b.id)+'" aria-label="'+esc(coverLabel(b,'표지 크게 보기'))+'"><span class="sglow" aria-hidden="true"></span>'
     +'<div class="cv" aria-hidden="true">'+cover(b)+'</div>'
     +'<div class="lab" aria-hidden="true"><div class="l1"><span class="d">'+mdot(b.date)+'</span><span class="w">'+wd(b.date)+'</span>'+badge(b.phase,'s')+'</div>'
     +'<div class="l2">제'+vol(b)+'호'+(multi(b)?' · '+b.seq+'회차':'')+'</div></div></'+t+'>';
@@ -2254,9 +2254,10 @@ function footer(){
 }
 
 /* ================= issue viewer ================= */
-/* A rack cover or a timeline day opens that issue over the page. A click with a modifier key, or the middle
-   button, still follows the link and opens the brief. Esc, the close button or a click beside the issue closes
-   it; the arrow buttons and the left/right keys move to the previous or next issue in publishing order. */
+/* A rack cover or a timeline day opens that issue over the page. They are buttons, not links: the artifact
+   frame opens links on its own (it may not open windows itself), so a link here could open the brief before the
+   page can stop it. Esc, the close button or a click beside the issue closes it; the arrow buttons and the
+   left/right keys move to the previous or next issue in publishing order. */
 var VW={id:null,opener:null,el:null,down:null};
 function byId(id){for(var i=0;i<B.length;i++) if(B[i].id===id) return B[i]; return null;}
 function vwName(b){var p=ymd(b.date); return '제'+vol(b)+'호'+(multi(b)?' '+b.seq+'회차':'')+' · '+p.m+'월 '+p.d+'일 '+wdF(b.date);}
@@ -2378,8 +2379,14 @@ function vwKey(e){
   }
 }
 function vwFromLink(e){
-  if(e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey) return;
+  if(e.defaultPrevented||e.button!==0) return;
   var a=e.target.closest('[data-id]'); if(!a||!e.currentTarget.contains(a)) return;
+  var b=byId(a.getAttribute('data-id')); if(!b) return;
+  e.preventDefault(); vwOpen(b,a);
+}
+function vwKeyOpen(e){
+  if(e.key!=='Enter'&&e.key!==' ') return;
+  var a=e.target.closest&&e.target.closest('[data-id]'); if(!a||!e.currentTarget.contains(a)) return;
   var b=byId(a.getAttribute('data-id')); if(!b) return;
   e.preventDefault(); vwOpen(b,a);
 }
@@ -2486,7 +2493,7 @@ function wire(ready){
   /* rack: older months unfold */
   $$('.grp .unfold').forEach(function(bt){bt.addEventListener('click',function(){var g=bt.closest('.grp'); UI.unfolded[g.getAttribute('data-k')]=true; g.classList.remove('fold'); bt.remove(); BK.fit(g,true);});});
   /* rack covers and timeline days open the issue viewer */
-  [$('#rack'),tl].forEach(function(el){ if(el) el.addEventListener('click',vwFromLink); });
+  [$('#rack'),tl].forEach(function(el){ if(el){ el.addEventListener('click',vwFromLink); el.addEventListener('keydown',vwKeyOpen); } });
   /* metrics table */
   var tbtn=$('#tbtn'), tbl=$('#mtable');
   tbtn.addEventListener('click',function(){var open=tbl.hidden; UI.tableOpen=open; tbl.hidden=!open; tbtn.textContent=open?'표 접기':'표로 보기'; tbtn.setAttribute('aria-expanded',String(open));});
