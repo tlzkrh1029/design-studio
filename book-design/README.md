@@ -26,6 +26,7 @@
 | 10 | 10/1 밤 | book_design 저장소 정리 | book_design 저장소 | [00](docs/00_작업_일지.md) |
 | 11 | 10/2 새벽 | 다른 AI가 이어받을 수 있도록 인계 문서와 작업 지침 작성 | HANDOFF.md, AGENTS.md | [00](docs/00_작업_일지.md) |
 | 12 | 10/2 오후 | design-studio 저장소의 `book-design/` 폴더로 이전 | 이 폴더 | [00](docs/00_작업_일지.md) |
+| 13 | 10/15 11시~15시 | 지난 호 열람 창 시안 A·B와 블라인드 평가, 시안 B를 실제 서고에 적용 | 서고 8번째 판 | [07](docs/07_서고_적용_이력.md) |
 
 요청과 결정을 시간순으로 따라가려면 [docs/00_작업_일지.md](docs/00_작업_일지.md)부터 읽으면 됩니다.
 
@@ -41,6 +42,7 @@ book-design/
 ├── magazine_analysis/     2단계: 경제주간지 표지 분석(보고서, 코딩 데이터, 계산 스크립트, 차트)
 ├── cover_design/          3~9단계: 표지 모듈, 서고 페이지 판본, 테마 시안, 두 차례 실험, 평가
 ├── canvas/                디자인 캔버스 '크립토 브리핑 표지 시안'의 프로젝트 파일
+├── iterations/            디자인 개선 판 폴더(가설, 사본, 확인, 평가, 사용자 결정)
 └── agents/                작업 중에 하위 에이전트 38개에 맡긴 작업의 지시문과 최종 보고
 ```
 
@@ -49,7 +51,8 @@ book-design/
 | 찾는 것 | 위치 |
 | --- | --- |
 | 표지 모듈 소스 | `cover_design/parts/*.js` → `cover_design/mz.js`, `cover_design/mz.css` |
-| 지금 서고에 올라가 있는 페이지(7번째 판) | `cover_design/library_night/final.html`, 원본 `src.html` |
+| 지금 서고에 올라가 있는 페이지(8번째 판) | `cover_design/library_night/final.html`, 원본 `src.html` |
+| 지난 호 열람 창 시안과 기록 | `iterations/2026-10-15_issue-viewer/` |
 | 그 이전 판(5번째, 6번째) | `cover_design/page/src.html`(5번째 판), `cover_design/page/final.html`(6번째 판) |
 | 테마 시안 3종 | `cover_design/themes/` |
 | 1차 실험(YAML, JSON) 명세와 결과 | `cover_design/experiment/` |
@@ -89,7 +92,7 @@ pip install playwright && playwright install chromium
 # 3. 표지 모듈을 조립하고, 미리보기 하네스와 서고 페이지를 만든다
 sh build_mz.sh                          # parts/*.js → mz.js
 python3 mkh.py                          # h.html(표지 미리보기 하네스)
-python3 library_night/build.py          # 7번째 판 final.html과 로컬 미리보기 preview.html
+python3 library_night/build.py          # 8번째 판 final.html과 로컬 미리보기 preview.html
 
 # 4. 화면을 캡처한다
 python3 shot.py shelf out/shelf.png                 # 하네스 모드: shelf, big, row, catalog, schemes

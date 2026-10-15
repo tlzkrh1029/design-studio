@@ -1,4 +1,4 @@
-"""Make this iteration's src.html from the adopted page (cover_design/library_night/src.html is not changed).
+"""Make this iteration's src.html from the 7th version (base_src.html, a copy of library_night/src.html before variant B was adopted).
 
 Two separate changes, applied in order so either can be taken alone:
   1. headline fit (a defect fix): long headlines no longer push the kicker, the date and the buttons out of the
@@ -10,7 +10,7 @@ Two separate changes, applied in order so either can be taken alone:
 """
 import os
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = '/home/claude/cover_design/library_night/src.html'
+SRC = os.path.join(HERE, 'base_src.html')  # the 7th version as it was on 2026-10-15, kept here so this iteration rebuilds the same way
 s = open(SRC, encoding='utf-8').read()
 
 

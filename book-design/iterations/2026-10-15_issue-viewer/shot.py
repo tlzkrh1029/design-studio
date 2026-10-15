@@ -2,7 +2,7 @@
 
 python3 shot.py pages    full-page captures of preview_base/a/b at 1440, 1300, 820, 390 (height 900):
                          horizontal overflow, cover headline overflow, console errors, hero markup vs base
-python3 shot.py viewer   the viewer open on a rack cover, A and B, at four window sizes, plus behaviour checks
+python3 shot.py viewer [a b | adopted]   the viewer open on a rack cover at four window sizes, plus behaviour checks
 """
 import sys, os, asyncio, json, re
 from playwright.async_api import async_playwright
@@ -84,11 +84,11 @@ def overlap(a, b):
     return a and b and not (a[2] <= b[0] or b[2] <= a[0] or a[3] <= b[1] or b[3] <= a[1])
 
 
-async def viewer():
+async def viewer(vs=('a', 'b')):
     sizes = [(1440, 900), (1300, 800), (820, 1180), (390, 844)]
     async with async_playwright() as p:
         br = await p.chromium.launch()
-        for v in ['a', 'b']:
+        for v in vs:
             for (w, h) in sizes:
                 pg = await br.new_page(viewport={'width': w, 'height': h})
                 errs = track(pg)
@@ -111,7 +111,7 @@ async def viewer():
                 await pg.close()
 
         # behaviour, on A at 1440x900 (B shares the code)
-        for v in ['a', 'b']:
+        for v in vs:
             pg = await br.new_page(viewport={'width': 1440, 'height': 900})
             errs = track(pg)
             await pg.goto(URL('preview_%s.html' % v)); await ready(pg)
@@ -175,6 +175,8 @@ async def viewer():
             print(v.upper(), 'errors', errs[:6])
             await pg.close()
 
+        if 'a' not in vs:
+            await br.close(); return
         # the review page: the switch changes the open viewer
         pg = await br.new_page(viewport={'width': 1440, 'height': 900})
         errs = track(pg)
@@ -190,4 +192,4 @@ async def viewer():
         await br.close()
 
 
-asyncio.run(pages() if sys.argv[1] == 'pages' else viewer())
+asyncio.run(pages() if sys.argv[1] == 'pages' else viewer(tuple(sys.argv[2:]) or ('a', 'b')))

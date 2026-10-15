@@ -1,9 +1,10 @@
 """Build the issue-viewer previews and the review page.
 
-preview_base.html  the adopted page (cover_design/library_night/src.html) with the 10/15 data copy: 'before'
+preview_base.html  the 7th version (base_src.html) with the 10/15 data copy: 'before'
 preview_a.html     this folder's src.html, viewer variant A (lamp and stand, like today's issue)
 preview_b.html     this folder's src.html, viewer variant B (larger cover, no lamp)
 draft.html         the review page to publish: Google Fonts, the same data copy and clock, and an A/B switch
+preview_adopted.html  library_night/src.html after variant B was adopted, with the same data copy
 
 All four read the same data copy (db_snapshot_1015.json, 46 briefs) and use the same fixed clock
 (2026-10-15 12:00 KST), so the hero and the rack are the same in every file. The live database is not used:
@@ -95,7 +96,7 @@ def out(name, text):
     print(name, len(text))
 
 
-base = page(D + 'library_night/src.html')
+base = page(os.path.join(HERE, 'base_src.html'))  # the 7th version, pinned
 out('preview_base.html', preview(base))
 
 mine = os.path.join(HERE, 'src.html')
@@ -108,3 +109,8 @@ if os.path.exists(mine):
     d = s.replace(title_old, '<title>서고 열람 창 시안</title>').replace('<div id="app"></div>', '<div id="app"></div>\n' + REVIEW, 1)
     out('draft.html', d)
     out('draft_local.html', preview(d))  # the review page with local fonts, for checking the switch
+
+# after the owner chose B (2026-10-15 14:35): the adopted page with the same data copy, to compare with preview_b.html
+adopted = D + 'library_night/src.html'
+if 'issue viewer' in open(adopted, encoding='utf-8').read():
+    out('preview_adopted.html', preview(page(adopted)))

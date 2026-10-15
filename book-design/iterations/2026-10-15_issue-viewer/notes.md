@@ -83,13 +83,16 @@
 
 | 파일 | 내용 |
 | --- | --- |
-| `patch.py` | 원본에서 이 판의 `src.html`을 만듭니다(1. 헤드라인 맞춤, 2. 열람 창). |
+| `base_src.html` | 7번째 판 원본의 사본(시안 B를 반영하기 전의 `library_night/src.html`) |
+| `patch.py` | `base_src.html`에서 이 판의 `src.html`을 만듭니다(1. 헤드라인 맞춤, 2. 열람 창). |
+| `adopt.py` | 이 판의 `src.html`에서 시안 B만 남겨 `library_night/src.html`에 씁니다. |
 | `src.html` | 이 판의 원본. 시안은 `<html data-vw="A">` 또는 `"B"`로 고릅니다(없으면 A). |
 | `build.py` | 미리보기 `preview_base.html`, `preview_a.html`, `preview_b.html`과 게시용 `draft.html`(A·B 전환 막대 포함), 그 로컬 글꼴판 `draft_local.html`을 만듭니다. |
 | `shot.py` | `pages`는 네 폭 전체 캡처와 점검, `viewer`는 열람 창 캡처와 동작 점검입니다. |
 | `board.py` | 전후 비교 이미지 `screenshots/board.jpg`를 만듭니다. |
 | `db_snapshot_1015.json` | 10월 15일 12시의 서고 데이터베이스 사본입니다. 평가용 고정 사본인 `library_night/db_snapshot.json`(10월 1일, 32건)은 바꾸지 않았습니다. |
 | `judge/`, `judge_map.json` | 블라인드 평가 자료, 점수, 대응표 |
+| `preview_adopted.html` | 반영한 `library_night/src.html`을 같은 데이터 사본과 시계로 만든 미리보기(시안 B와 비교용) |
 
 게시한 시안: Claude 아티팩트 `2ibvautwExqtkgUPsLPsw8`(서고 열람 창 시안, 2판, 2026-10-15 게시). 원본은 이 폴더의 `draft.html`이고, Claude 전용 기능을 쓰지 않으므로 다른 브라우저에서도 그대로 열립니다. 실제 서고와 데이터베이스는 바꾸지 않았습니다.
 
@@ -97,4 +100,9 @@
 
 ## 사용자 결정
 
-아직 없습니다. 고른 시안만 `library_night/src.html`에 반영합니다. 헤드라인 맞춤은 시안 선택과 따로 반영할 수 있습니다.
+10월 15일 14시 35분에 "시안 b로 가자. 착수하자."라고 했습니다. 시안 A는 고르지 않았습니다.
+
+- `adopt.py`가 이 판의 `src.html`에서 시안 A의 스타일과 마크업, 시안 전환 장치(`<html data-vw>`, `vw-variant` 이벤트)를 빼고 시안 B만 남겨 `library_night/src.html`에 썼습니다. 시안 B의 규칙은 `.vw-b .x`에서 `.vw .x`로 옮겨 구체성을 그대로 두었습니다. 헤드라인 맞춤도 함께 들어갔습니다.
+- 원본이 바뀌었으므로 7번째 판 원본을 이 폴더의 `base_src.html`로 남기고, `patch.py`와 `build.py`가 그 사본을 읽도록 고쳤습니다. 그래서 이 판의 시안과 기준선은 언제든 같은 모습으로 다시 만들 수 있습니다.
+- 확인: 반영한 원본으로 만든 `preview_adopted.html`을 `preview_b.html`과 같은 조건(표지 질감 난수 고정)에서 비교했더니 네 가지 창 크기, 긴 헤드라인, 두 번 발행한 날, 첫 화면에서 화소 단위까지 같았습니다. `python3 shot.py viewer adopted`의 동작 점검도 모두 통과했고, `library_night/shot.py`의 네 폭 점검(10월 1일 데이터 사본)에서 가로 넘침, 표제 넘침, 오류가 없었습니다.
+- 게시: 10월 15일 14시 44분에 실제 서고에 8번째 판으로 게시했습니다(아티팩트 버전 `1792043061-b6be`). 제목 '📚 크립토 daily 브리핑 서고 ⭕'와 런타임 기능 선언은 그대로 두었습니다.
