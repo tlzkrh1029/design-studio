@@ -142,17 +142,38 @@ async def viewer(vs=('a', 'b')):
             await pg.mouse.click(tb[0], tb[1]); await pg.wait_for_timeout(150)
             print(v.upper(), 'text click keeps it open', await pg.evaluate("!document.querySelector('.vw').hidden"))
             await pg.keyboard.press('Escape')
-            # a ctrl-click keeps the link behaviour
+            # like claude.ai's artifact frame, record every click on a link before the page sees it (capture phase);
+            # the openers must give it nothing to open, while the viewer's own brief button stays a link
+            await pg.evaluate("""()=>{window.__links=[]; document.addEventListener('click',function(e){
+                var a=e.target.closest&&e.target.closest('a[href]'); if(a){window.__links.push(a.getAttribute('href')); e.preventDefault();}},true);}""")
+            n_open = await pg.evaluate("document.querySelectorAll('#rack [data-id],.tl [data-id]').length")
+            n_href = await pg.evaluate("[...document.querySelectorAll('#rack [data-id],.tl [data-id]')].filter(x=>x.hasAttribute('href')).length")
             el = pg.locator('#rack [data-id="2026-09-22-1"]')
             await el.scroll_into_view_if_needed()
-            try:
-                async with pg.context.expect_page(timeout=3000) as np:
-                    await el.click(modifiers=['Control'])
-                newp = await np.value
-                print(v.upper(), 'ctrl-click opened a new tab:', newp.url[:60], '| viewer open:', await pg.evaluate("!!document.querySelector('.vw')&&!document.querySelector('.vw').hidden"))
-                await newp.close()
-            except Exception as e:
-                print(v.upper(), 'ctrl-click: no new tab', str(e)[:80], '| viewer open:', await pg.evaluate("!!document.querySelector('.vw')&&!document.querySelector('.vw').hidden"))
+            await el.click(); await pg.wait_for_timeout(300)
+            r1 = await pg.evaluate("[!document.querySelector('.vw').hidden, document.querySelector('#vw-name').textContent, window.__links.slice()]")
+            await pg.click('.vw .acts .btn-pri'); await pg.wait_for_timeout(100)
+            r2 = await pg.evaluate("window.__links.slice()")
+            await pg.keyboard.press('Escape'); await pg.wait_for_timeout(150)
+            print(v.upper(), 'openers', n_open, 'with href', n_href, '| cover click: open, name, links', r1, '| brief button links', r2)
+            await el.click(modifiers=['Control']); await pg.wait_for_timeout(300)
+            print(v.upper(), 'ctrl-click', await pg.evaluate("[!document.querySelector('.vw').hidden, window.__links.length]"), 'pages', len(pg.context.pages))
+            await pg.keyboard.press('Escape'); await pg.wait_for_timeout(150)
+            # keyboard: Enter and Space on a rack cover open it without scrolling the page; focus comes back on close
+            for key in ['Enter', 'Space']:
+                await el.focus(); y0 = await pg.evaluate('scrollY')
+                await pg.keyboard.press(key); await pg.wait_for_timeout(300)
+                st = await pg.evaluate("[!document.querySelector('.vw').hidden, document.querySelector('#vw-name').textContent]")
+                await pg.keyboard.press('Escape'); await pg.wait_for_timeout(150)
+                print(v.upper(), key, 'opens', st, 'scrolled', (await pg.evaluate('scrollY')) - y0,
+                      'focus back on', await pg.evaluate("document.activeElement.getAttribute('data-id')"))
+            # timeline: one tab stop, an arrow moves, Enter opens that day
+            tc = pg.locator('.tl a.tc.latest')
+            await tc.scroll_into_view_if_needed(); await tc.focus()
+            await pg.keyboard.press('ArrowLeft'); await pg.keyboard.press('Enter'); await pg.wait_for_timeout(300)
+            print(v.upper(), 'timeline arrow+Enter', await pg.evaluate("[!document.querySelector('.vw').hidden, document.querySelector('#vw-name').textContent, window.__links.length]"))
+            await pg.keyboard.press('Escape'); await pg.wait_for_timeout(150)
+            print(v.upper(), 'timeline focus back on', await pg.evaluate("[document.activeElement.className, document.activeElement.getAttribute('data-id'), document.activeElement.tabIndex, document.querySelectorAll('.tl a.tc[tabindex=\"0\"]').length]"))
             # a timeline day opens the viewer; the last day is today's issue
             tc = pg.locator('.tl a.tc.latest')
             await tc.scroll_into_view_if_needed(); await tc.click()
