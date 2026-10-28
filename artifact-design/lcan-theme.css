@@ -1,0 +1,49 @@
+/* lcan-theme.css: the artifact-design beige style for elements kept in lcan-design/.
+   Maps the upstream element tokens (--ux-*) and the tokens added in lcan-design (--lcan-*)
+   to the beige style recorded in artifact-design/HANDOFF.md section 2 (values checked 2026-10-05).
+   Token names follow lcan-design/upstream/lucian-uxui-prompt/tokens.css (commit 7e339fa).
+
+   Status: draft. Only values written in HANDOFF.md section 2 are set here. The tokens listed at
+   the end have no documented value yet and are decided in the first lcan-design experiment.
+   The beige style has no dark values, so this file sets light values only.
+   When the beige style in HANDOFF.md section 2 changes, change this file in the same commit.
+   Rules for theme files: lcan-design/AGENTS.md. */
+
+:root {
+  /* Surfaces */
+  --ux-page: #F6F3EC;        /* screen background */
+  --ux-surface: #FFFDF8;     /* cards */
+  --ux-surface-2: #EFEAE0;   /* secondary surface */
+
+  /* Lines (never used for text) */
+  --ux-line: #DCD5C6;        /* borders */
+  --ux-line-2: #B9B0A0;      /* stronger lines and outlines */
+
+  /* Text. Contrast on page / surface / surface-2 */
+  --ux-ink: #1A1916;         /* body text: 15.86 / 17.29 / 14.66 : 1 */
+  --ux-ink-2: #57534A;       /* secondary text: 6.91 / 7.54 / 6.39 : 1 */
+  --ux-ink-3: #6E695E;       /* small notes: 4.93 / 5.37 / 4.56 : 1 */
+
+  /* Primary buttons and strong marks */
+  --ux-accent: #1A1916;      /* filled background, also used as text: 15.86 / 17.29 / 14.66 : 1 */
+  --ux-accent-ink: #FFFDF8;  /* text on --ux-accent: 17.29 : 1 */
+
+  /* Rise and fall (added in lcan-design; rise is red, fall is blue) */
+  --lcan-up: #B8322A;        /* 5.37 / 5.86 / 4.97 : 1 */
+  --lcan-down: #2657A6;      /* 6.32 / 6.89 / 5.85 : 1 */
+
+  /* Type */
+  --lcan-font-sans: "IBM Plex Sans KR", sans-serif;  /* body and UI */
+  --lcan-font-serif: "Noto Serif KR", serif;         /* large titles */
+  --lcan-font-mono: "IBM Plex Mono", monospace;      /* numbers and times */
+}
+
+/* Not decided yet (first lcan-design experiment):
+     --ux-surface-3, --ux-accent-2, --ux-accent-soft, --ux-mint, --ux-warn, --ux-danger,
+     --ux-glass, --ux-glass-line, --ux-shadow, --ux-shadow-strong, --ux-grad,
+     radius and weight tokens, dark values.
+   --ux-mint, --ux-danger and --ux-warn are also used as text upstream, so their values need 4.5:1.
+   --ux-ease and --ux-spring keep the upstream motion curves.
+   Documented beige colours not yet tied to a token:
+     #F4E27C  highlight background for today's verdict and near-threshold states (never text)
+     #9A7400  progress bars (never text) */
