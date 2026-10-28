@@ -15,6 +15,7 @@
 ## 스타일
 
 - 지금 시안의 스타일(바탕, 글자색, 강조색, 글꼴, 모서리)은 HANDOFF.md 2절에 정리되어 있습니다. 스타일을 바꿀 때는 그 표의 어느 값을 왜 바꾸는지 먼저 적습니다(맨 위 AGENTS.md '디자인 개선 절차'의 가설 적기).
+- 베이지 스타일의 값을 바꿀 때는, [lcan-design](../lcan-design/README.md)의 요소에 이 스타일을 적용하는 테마 파일 [lcan-theme.css](lcan-theme.css)도 같은 커밋에서 함께 고칩니다. 테마 파일의 규칙은 [lcan-design/AGENTS.md](../lcan-design/AGENTS.md)에 있습니다(2026-10-28).
 
 ## 예시 값
 
