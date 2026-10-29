@@ -1,0 +1,13 @@
+/* Values shared by options A, B and C (beige style, first lcan-design experiment, 2026-10-29).
+   Loaded after artifact-design/lcan-theme.css and before one option file.
+   Every value comes from the beige drafts (artifact-design/drafts/dashboard-alternatives/source)
+   or is a darker copy of one of their colours, made so that it can also be used as text (4.5:1). */
+:root {
+  --ux-surface-3: #E6E0D3;               /* track behind share bars in the metric-tree board */
+  --ux-accent-2: #57534A;                /* same as secondary text; none of the three elements uses it */
+  --ux-mint: #117855;                    /* chart green #138A62, darkened to reach 4.5:1 on all three surfaces */
+  --ux-warn: #866500;                    /* near-threshold bar gold #9A7400, darkened the same way (decision 2 may change it) */
+  --ux-danger: #B23029;                  /* rise red #B8322A, darkened slightly so the 023 hover text reaches 4.5:1 */
+  --ux-glass: rgba(255,253,248,.62);     /* card colour, translucent; no upstream element uses it */
+  --ux-glass-line: rgba(255,253,248,.88);
+}

@@ -1,13 +1,18 @@
-/* lcan-theme.css: the artifact-design beige style for elements kept in lcan-design/.
+/* NOT USED (2026-10-29). Do not load this file in a page.
+   In the first lcan-design comparison the owner preferred the upstream look of the elements to the beige
+   options built on this file (lcan-design/drafts/beige-token-options/notes.md), and then chose the upstream
+   look with only its text contrast fixed. lcan-design elements now use lcan-design/lcan-theme.css.
+   This file is kept, unchanged below, as the record of that comparison; its build.py reads it.
+   It does not follow later changes to the beige style in artifact-design/HANDOFF.md section 2.
+
+   lcan-theme.css: the artifact-design beige style for elements kept in lcan-design/.
    Maps the upstream element tokens (--ux-*) and the tokens added in lcan-design (--lcan-*)
    to the beige style recorded in artifact-design/HANDOFF.md section 2 (values checked 2026-10-05).
    Token names follow lcan-design/upstream/lucian-uxui-prompt/tokens.css (commit 7e339fa).
 
    Status: draft. Only values written in HANDOFF.md section 2 are set here. The tokens listed at
    the end have no documented value yet and are decided in the first lcan-design experiment.
-   The beige style has no dark values, so this file sets light values only.
-   When the beige style in HANDOFF.md section 2 changes, change this file in the same commit.
-   Rules for theme files: lcan-design/AGENTS.md. */
+   The beige style has no dark values, so this file sets light values only. */
 
 :root {
   /* Surfaces */
