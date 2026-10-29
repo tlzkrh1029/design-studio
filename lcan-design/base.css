@@ -1,0 +1,62 @@
+/* lcan-design base.css: the token names, their default values and the .ux base rules every element needs.
+   Defaults are the upstream light values (upstream/lucian-uxui-prompt/tokens.css, commit 7e339fa).
+   Load this file first, then a work's lcan-theme.css, which sets the values for that work's style.
+   Two changes from the upstream file:
+   - the .ux font stack reads --lcan-font-sans, so a theme can set the font without editing elements;
+   - there are no dark values here. A theme file that has a dark style defines its own dark blocks,
+     so a light-only theme is never mixed with the upstream dark values. */
+
+:root {
+  color-scheme: light;
+
+  /* Upstream tokens (--ux-*), light values */
+  --ux-page: #F4F2EE;
+  --ux-surface: #FFFFFF;
+  --ux-surface-2: #F5F3EF;
+  --ux-surface-3: #EAE7E1;
+  --ux-ink: #16151B;
+  --ux-ink-2: #57535F;
+  --ux-ink-3: #8E8A97;
+  --ux-line: rgba(22,21,27,.09);
+  --ux-line-2: rgba(22,21,27,.17);
+  --ux-accent: #6A57F2;
+  --ux-accent-2: #2F8FE0;
+  --ux-accent-soft: rgba(106,87,242,.12);
+  --ux-accent-ink: #FFFFFF;
+  --ux-mint: #119C72;
+  --ux-warn: #D6731E;
+  --ux-danger: #D93A55;
+  --ux-glass: rgba(255,255,255,.58);
+  --ux-glass-line: rgba(255,255,255,.85);
+  --ux-shadow: rgba(40,30,80,.14);
+  --ux-shadow-strong: rgba(40,30,80,.3);
+  --ux-grad: linear-gradient(120deg,#7B61FF,#3D8BFF 55%,#1FB89A);
+  --ux-ease: cubic-bezier(.2,.8,.2,1);
+  --ux-spring: cubic-bezier(.34,1.45,.64,1);
+
+  /* Tokens added in lcan-design (--lcan-*). Defaults follow the upstream convention: rise = mint, fall = danger. */
+  --lcan-up: #119C72;
+  --lcan-down: #D93A55;
+  --lcan-font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+  --lcan-font-serif: ui-serif, Georgia, serif;
+  --lcan-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* .ux base rules, as upstream, with the font stack read from --lcan-font-sans */
+.ux, .ux *, .ux *::before, .ux *::after { box-sizing: border-box }
+.ux {
+  font-family: var(--lcan-font-sans);
+  color: var(--ux-ink); -webkit-font-smoothing: antialiased; letter-spacing: -.01em;
+  -webkit-tap-highlight-color: transparent;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+:where(.ux) :is(button, input, textarea, select) { font: inherit; color: inherit }
+:where(.ux) button { cursor: pointer }
+.ux :focus-visible { outline: 2px solid var(--ux-accent); outline-offset: 3px }
+.ux [hidden] { display: none !important }
+@media (prefers-reduced-motion: reduce) {
+  .ux, .ux *, .ux *::before, .ux *::after {
+    animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important; scroll-behavior: auto !important;
+  }
+}

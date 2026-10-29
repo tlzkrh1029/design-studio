@@ -1,0 +1,987 @@
+<title>Lucian 원본 명암비 보정</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Noto+Serif+KR:wght@700&display=swap">
+<!-- Built by lcan-design/drafts/original-contrast-fix/build.py from upstream commit 7e339fa. Do not edit by hand. -->
+<style>
+/* Layout: a specimen sheet. The decision and the six changed tokens sit at the top; each element then gets
+   one row with the upstream look and the fixed look side by side; the contrast checks and the limits close the page.
+   The chrome keeps the artifact-design beige style of the first comparison, which commits to one light look. */
+:root {
+  color-scheme: light;
+  --paper: #F6F3EC;   /* screen */
+  --card: #FFFDF8;    /* cards */
+  --sub: #EFEAE0;     /* secondary surface */
+  --line: #DCD5C6;    /* borders */
+  --rule: #B9B0A0;    /* stronger lines, never text */
+  --ink: #1A1916;
+  --ink-2: #57534A;
+  --ink-3: #6E695E;   /* small notes, 4.56:1 on --sub */
+  --hl: #F4E27C;      /* the one highlight: what to decide */
+  --miss: #B8322A;
+  --sans: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  --serif: "Noto Serif KR", "AppleMyungjo", "Nanum Myeongjo", ui-serif, serif;
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+html { background: var(--paper) }
+body { background: var(--paper); color: var(--ink); font: 400 14px/1.6 var(--sans); }
+.wrap { max-width: 1400px; margin: 0 auto; padding-block: 40px 64px; word-break: keep-all; overflow-wrap: break-word;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+@media (min-width: 720px) { .wrap { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); } }
+.wrap code, .wrap .mono { font-family: var(--mono); font-size: .92em; }
+.top { display: grid; gap: 14px; }
+.kicker { margin: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-2); letter-spacing: .02em; }
+.top h1 { margin: 0; font: 700 30px/1.3 var(--serif); letter-spacing: -.01em; text-wrap: balance; }
+.lead { margin: 0; max-width: 64ch; font-size: 15px; line-height: 1.75; }
+.decide { margin: 8px 0 0; max-width: 960px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 4px; }
+.decide dt { font-weight: 700; font-size: 15px; }
+.decide dt mark { background: linear-gradient(transparent 58%, var(--hl) 58%); color: inherit; padding: 0 2px; }
+.decide dd { margin: 0; color: var(--ink-2); }
+.meta { margin: 0; font-size: 12.5px; color: var(--ink-3); max-width: 80ch; }
+section.part { margin-top: 56px; }
+.part > h2 { margin: 0 0 6px; font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+.intro { margin: 0; max-width: 72ch; color: var(--ink-2); }
+.part-ctl { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 14px; }
+.flip-state { font-size: 12.5px; color: var(--ink-2); }
+.sw { flex: none; width: 14px; height: 14px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(26,25,22,.18); }
+.row { margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
+.row-head { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: flex-start; justify-content: space-between; }
+.row-title { flex: 999 1 520px; min-width: 0; display: grid; gap: 4px; }
+.row-title h3 { margin: 0; font-size: 17px; font-weight: 700; display: flex; align-items: baseline; gap: 10px; }
+.num { font-family: var(--mono); font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.look { margin: 0; max-width: 80ch; }
+.fixed { margin: 0; max-width: 80ch; font-size: 12.5px; color: var(--ink-3); }
+.row-ctl { flex: 1 0 auto; display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--rule); background: var(--card); color: var(--ink); font: 600 13.5px/1 var(--sans); cursor: pointer; }
+.btn:hover { background: var(--sub); }
+.btn-ink { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.btn-ink:hover { background: #33312C; }
+.btn[aria-pressed="true"] { background: var(--ink); color: var(--card); border-color: var(--ink); }
+.btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.btn[disabled] { opacity: .55; cursor: default; }
+.cells { display: grid; gap: 12px; margin-top: 16px; max-width: 960px; }
+@media (min-width: 640px) { .cells { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.cell { margin: 0; min-width: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--ux-page); }
+.cell figcaption { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 9px 12px; background: var(--card); border-bottom: 1px solid var(--line); font-size: 12.5px; }
+.cell figcaption b { font-size: 13.5px; }
+.cell figcaption span { color: var(--ink-3); text-align: right; }
+.cell.is-flipped figcaption b::after { content: " · 지금은 원본 값"; font-weight: 600; color: var(--ink-2); }
+.stage { position: relative; overflow: hidden; height: calc(var(--h) + 52px); }
+/* inherited text settings as in the upstream gallery, so the elements see the same defaults */
+.fit { position: absolute; left: 50%; top: 50%; width: max-content; transform: translate(-50%, -50%); transform-origin: 50% 50%;
+  font-size: 16px; font-weight: 400; line-height: normal; letter-spacing: -.01em; text-align: left; white-space: normal; word-break: normal; overflow-wrap: normal; color: var(--ux-ink); }
+.tbl { margin-top: 16px; overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--card); max-width: 960px; }
+.tbl table { width: 100%; border-collapse: collapse; min-width: 600px; }
+.tbl th, .tbl td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
+.tbl tr:last-child > * { border-bottom: 0; }
+.tbl thead th { font-size: 12.5px; color: var(--ink-2); font-weight: 700; background: var(--sub); }
+.tbl th[scope="row"] { font-weight: 600; }
+.tbl th code { white-space: nowrap; }
+.tbl .role { display: block; font-size: 12px; font-weight: 400; color: var(--ink-3); }
+.tbl .n { font-family: var(--mono); font-size: 12.5px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tbl .val { white-space: nowrap; }
+.tbl .val .sw { display: inline-block; vertical-align: -2px; margin-right: 6px; }
+.scroll-hint { display: none; margin: 8px 0 0; font-size: 12.5px; color: var(--ink-3); }
+@media (max-width: 700px) { .scroll-hint { display: block; } }
+.miss { margin-left: 6px; padding: 1px 6px; border-radius: 999px; border: 1px solid var(--miss); color: var(--miss); font: 600 11px/1.4 var(--sans); }
+.note { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-3); max-width: 80ch; }
+.limits { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; max-width: 80ch; }
+.limits li { padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; }
+.limits b { display: block; margin-bottom: 2px; }
+.foot { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--ink-3); display: grid; gap: 4px; }
+.foot a { color: var(--ink-2); }
+.foot a:hover { color: var(--ink); }
+</style>
+<style>
+/* lcan-design/base.css */
+/* lcan-design base.css: the token names, their default values and the .ux base rules every element needs.
+   Defaults are the upstream light values (upstream/lucian-uxui-prompt/tokens.css, commit 7e339fa).
+   Load this file first, then a work's lcan-theme.css, which sets the values for that work's style.
+   Two changes from the upstream file:
+   - the .ux font stack reads --lcan-font-sans, so a theme can set the font without editing elements;
+   - there are no dark values here. A theme file that has a dark style defines its own dark blocks,
+     so a light-only theme is never mixed with the upstream dark values. */
+
+:root {
+  color-scheme: light;
+
+  /* Upstream tokens (--ux-*), light values */
+  --ux-page: #F4F2EE;
+  --ux-surface: #FFFFFF;
+  --ux-surface-2: #F5F3EF;
+  --ux-surface-3: #EAE7E1;
+  --ux-ink: #16151B;
+  --ux-ink-2: #57535F;
+  --ux-ink-3: #8E8A97;
+  --ux-line: rgba(22,21,27,.09);
+  --ux-line-2: rgba(22,21,27,.17);
+  --ux-accent: #6A57F2;
+  --ux-accent-2: #2F8FE0;
+  --ux-accent-soft: rgba(106,87,242,.12);
+  --ux-accent-ink: #FFFFFF;
+  --ux-mint: #119C72;
+  --ux-warn: #D6731E;
+  --ux-danger: #D93A55;
+  --ux-glass: rgba(255,255,255,.58);
+  --ux-glass-line: rgba(255,255,255,.85);
+  --ux-shadow: rgba(40,30,80,.14);
+  --ux-shadow-strong: rgba(40,30,80,.3);
+  --ux-grad: linear-gradient(120deg,#7B61FF,#3D8BFF 55%,#1FB89A);
+  --ux-ease: cubic-bezier(.2,.8,.2,1);
+  --ux-spring: cubic-bezier(.34,1.45,.64,1);
+
+  /* Tokens added in lcan-design (--lcan-*). Defaults follow the upstream convention: rise = mint, fall = danger. */
+  --lcan-up: #119C72;
+  --lcan-down: #D93A55;
+  --lcan-font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+  --lcan-font-serif: ui-serif, Georgia, serif;
+  --lcan-font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* .ux base rules, as upstream, with the font stack read from --lcan-font-sans */
+.ux, .ux *, .ux *::before, .ux *::after { box-sizing: border-box }
+.ux {
+  font-family: var(--lcan-font-sans);
+  color: var(--ux-ink); -webkit-font-smoothing: antialiased; letter-spacing: -.01em;
+  -webkit-tap-highlight-color: transparent;
+  word-break: keep-all; overflow-wrap: break-word;
+}
+:where(.ux) :is(button, input, textarea, select) { font: inherit; color: inherit }
+:where(.ux) button { cursor: pointer }
+.ux :focus-visible { outline: 2px solid var(--ux-accent); outline-offset: 3px }
+.ux [hidden] { display: none !important }
+@media (prefers-reduced-motion: reduce) {
+  .ux, .ux *, .ux *::before, .ux *::after {
+    animation-duration: .001ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important; scroll-behavior: auto !important;
+  }
+}
+
+/* themes, one class per cell */
+.t-orig{color-scheme:light;--ux-page:#F4F2EE;--ux-surface:#FFFFFF;--ux-surface-2:#F5F3EF;--ux-surface-3:#EAE7E1;--ux-ink:#16151B;--ux-ink-2:#57535F;--ux-ink-3:#8E8A97;--ux-line:rgba(22,21,27,.09);--ux-line-2:rgba(22,21,27,.17);--ux-accent:#6A57F2;--ux-accent-2:#2F8FE0;--ux-accent-soft:rgba(106,87,242,.12);--ux-accent-ink:#FFFFFF;--ux-mint:#119C72;--ux-warn:#D6731E;--ux-danger:#D93A55;--ux-glass:rgba(255,255,255,.58);--ux-glass-line:rgba(255,255,255,.85);--ux-shadow:rgba(40,30,80,.14);--ux-shadow-strong:rgba(40,30,80,.3);--ux-grad:linear-gradient(120deg,#7B61FF,#3D8BFF 55%,#1FB89A);--ux-ease:cubic-bezier(.2,.8,.2,1);--ux-spring:cubic-bezier(.34,1.45,.64,1)}
+.t-fix{color-scheme:light;--ux-page:#F4F2EE;--ux-surface:#FFFFFF;--ux-surface-2:#F5F3EF;--ux-surface-3:#EAE7E1;--ux-ink:#16151B;--ux-ink-2:#57535F;--ux-ink-3:#716C7A;--ux-line:rgba(22,21,27,.09);--ux-line-2:rgba(22,21,27,.17);--ux-accent:#6450F1;--ux-accent-2:#1C72BA;--ux-accent-soft:rgba(106,87,242,.12);--ux-accent-ink:#FFFFFF;--ux-mint:#0E7E5C;--ux-warn:#A85A18;--ux-danger:#C0253F;--ux-glass:rgba(255,255,255,.58);--ux-glass-line:rgba(255,255,255,.85);--ux-shadow:rgba(40,30,80,.14);--ux-shadow-strong:rgba(40,30,80,.3);--ux-grad:linear-gradient(120deg,#7B61FF,#3D8BFF 55%,#1FB89A);--ux-ease:cubic-bezier(.2,.8,.2,1);--ux-spring:cubic-bezier(.34,1.45,.64,1)}
+</style>
+<div class="wrap">
+<header class="top">
+  <p class="kicker">lcan-design 둘째 비교 · 2026년 10월 29일</p>
+  <h1>원본과 명암비 보정판</h1>
+  <p class="lead">앞선 비교에서 세 요소 모두 Lucian 원본이 낫다고 하셨습니다. 그런데 원본 값은 디자인 원칙 3(글자 명암비 4.5:1)에 못 미치는 곳이 있습니다. 그래서 원본의 모양은 그대로 두고, 기준에 못 미치는 토큰 여섯 개만 고친 보정판을 만들어 원본과 나란히 놓았습니다. 보정판은 각 토큰의 색상과 채도를 그대로 두고, 밝기만 기준을 넘는 데까지 가장 적게 낮췄습니다.</p>
+  <dl class="decide">
+    <dt><mark>고를 것</mark> 보정판을 기본으로 쓸지, 원본을 그대로 쓸지</dt>
+    <dd>이번에 점검한 여섯 곳에서 원본은 5곳이 4.5:1에 못 미치고, 보정판은 모두 4.5:1 이상입니다(가장 낮은 곳 4.52:1). 두 칸의 차이가 잘 보이지 않으면 아래의 ‘번갈아 보기’를 눌러 보세요.</dd>
+  </dl>
+  <p class="meta">원본은 Lucian UX/UI Prompt 커밋 <span class="mono">7e339fa</span>입니다. 두 칸 모두 원본 갤러리처럼 웹 글꼴을 불러오지 않아서, 기기의 글꼴로 보입니다. 라이트 화면만 비교합니다.</p>
+</header>
+
+<section class="part" aria-labelledby="d1">
+  <h2 id="d1">바뀌는 토큰 여섯 개</h2>
+  <p class="intro">나머지 토큰(바탕, 카드, 선, 본문 글자, 그림자, 그라디언트 등)은 원본 값 그대로입니다.</p>
+  <div class="tbl"><table>
+    <thead><tr><th scope="col">토큰</th><th scope="col">원본</th><th scope="col">보정판</th><th scope="col">밝기 변화(HLS)</th><th scope="col">가장 낮은 글자 명암비</th><th scope="col">글자로 쓰는 요소 수</th></tr></thead>
+    <tbody><tr><th scope="row"><code>--ux-ink-3</code><span class="role">작은 설명 글자</span></th><td class="val"><i class="sw" style="background:#8E8A97" aria-hidden="true"></i><code>#8E8A97</code></td><td class="val"><i class="sw" style="background:#716C7A" aria-hidden="true"></i><code>#716C7A</code></td><td class="n">−11.6</td><td class="n">3.01 → 4.55</td><td class="n">222</td></tr><tr><th scope="row"><code>--ux-accent</code><span class="role">강조</span></th><td class="val"><i class="sw" style="background:#6A57F2" aria-hidden="true"></i><code>#6A57F2</code></td><td class="val"><i class="sw" style="background:#6450F1" aria-hidden="true"></i><code>#6450F1</code></td><td class="n">−1.6</td><td class="n">4.41 → 4.74</td><td class="n">88</td></tr><tr><th scope="row"><code>--ux-mint</code><span class="role">완료</span></th><td class="val"><i class="sw" style="background:#119C72" aria-hidden="true"></i><code>#119C72</code></td><td class="val"><i class="sw" style="background:#0E7E5C" aria-hidden="true"></i><code>#0E7E5C</code></td><td class="n">−6.5</td><td class="n">3.12 → 4.52</td><td class="n">30</td></tr><tr><th scope="row"><code>--ux-danger</code><span class="role">위험</span></th><td class="val"><i class="sw" style="background:#D93A55" aria-hidden="true"></i><code>#D93A55</code></td><td class="val"><i class="sw" style="background:#C0253F" aria-hidden="true"></i><code>#C0253F</code></td><td class="n">−9.0</td><td class="n">4.01 → 5.25</td><td class="n">31</td></tr><tr><th scope="row"><code>--ux-warn</code><span class="role">경고</span></th><td class="val"><i class="sw" style="background:#D6731E" aria-hidden="true"></i><code>#D6731E</code></td><td class="val"><i class="sw" style="background:#A85A18" aria-hidden="true"></i><code>#A85A18</code></td><td class="n">−10.2</td><td class="n">2.97 → 4.54</td><td class="n">6</td></tr><tr><th scope="row"><code>--ux-accent-2</code><span class="role">보조 강조</span></th><td class="val"><i class="sw" style="background:#2F8FE0" aria-hidden="true"></i><code>#2F8FE0</code></td><td class="val"><i class="sw" style="background:#1C72BA" aria-hidden="true"></i><code>#1C72BA</code></td><td class="n">−11.2</td><td class="n">3.07 → 4.51</td><td class="n">1</td></tr></tbody>
+  </table></div>
+  <p class="scroll-hint">표를 옆으로 밀면 나머지 열이 보입니다.</p>
+  <p class="note">가장 낮은 글자 명암비는 바탕, 카드, 보조 면 가운데 가장 낮은 값입니다. 글자로 쓰는 요소 수는 원본 요소 400개 가운데 그 토큰을 글자색(<code>color:</code>)으로 쓰는 요소의 수입니다.</p>
+</section>
+
+<section class="part" aria-labelledby="d2">
+  <h2 id="d2">세 요소</h2>
+  <p class="intro">왼쪽은 원본, 오른쪽은 보정판입니다. 칸 안의 요소를 직접 눌러 볼 수 있고, ‘같은 동작 보기’를 누르면 두 칸이 같은 순서로 움직입니다.</p>
+  <div class="part-ctl"><button type="button" class="btn" id="flip" aria-pressed="false">번갈아 보기</button><span class="flip-state" id="flip-state" aria-live="polite"></span></div>
+  <article class="row" data-row="023"><div class="row-head"><div class="row-title"><h3><span class="num">023</span>펼쳐지는 알림 설정</h3><p class="look">작은 설명 글자, ‘2개 켜짐’ 배지의 글자, 켜진 스위치의 초록이 바뀝니다. ‘모두 끄기’에 마우스를 올렸을 때의 빨강도 바뀝니다.</p><p class="fixed">왼쪽 아이콘 칸 세 개의 그라디언트는 요소 코드에 적혀 있어서 두 칸에서 같습니다.</p></div><div class="row-ctl"><button type="button" class="btn btn-ink" data-play="023">같은 동작 보기</button><button type="button" class="btn" data-reset="023">처음 상태로</button></div></div><div class="cells"><figure class="cell t-orig"><figcaption><b>원본</b><span>Lucian 기본값 그대로</span></figcaption><div class="stage" data-el="023" style="--h:420px" role="group" aria-label="원본: 023"><div class="fit">
+<!-- Lucian UX/UI Prompt #023 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#023 -->
+<!--
+Element: 펼쳐지는 알림 설정
+ID: 023 · Category: 토글·선택 · Tags: settings, switch, list, expand, disclosure
+What it does: 스위치를 켜면 그 아래로 세부 옵션이 높이를 늘리며 펼쳐집니다. ‘모두 끄기’를 누르면 위에서부터 차례로 꺼지고, 꺼진 항목의 아이콘은 회색으로 가라앉습니다.
+How to use it: 이메일 요약을 켜서 주기를 골라 보고, 아래의 모두 끄기도 눌러 보세요
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#023
+-->
+<style>
+.u023{position:relative;display:flex;flex-direction:column;width:340px;height:420px;padding:22px 20px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u023-top{display:flex;align-items:center;justify-content:space-between;padding:0 4px 10px}
+.u023-top b{font-size:20px;font-weight:760;letter-spacing:-.035em}
+.u023-badge{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--ux-accent-soft);color:var(--ux-accent);font-variant-numeric:tabular-nums;transition:background-color .3s,color .3s}
+.u023-item{border-top:1px solid var(--ux-line)}
+.u023-head{display:flex;align-items:center;gap:14px;padding:14px 4px}
+.u023-ic{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;color:#fff;background:var(--g);transition:filter .5s var(--ux-ease),opacity .5s var(--ux-ease)}
+.u023-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u023-item.is-off .u023-ic{filter:grayscale(1);opacity:.45}
+.u023-t{flex:1;min-width:0}
+.u023-t b{display:block;font-size:15.5px;font-weight:680;letter-spacing:-.02em}
+.u023-t small{display:block;margin-top:2px;font-size:13px;color:var(--ux-ink-3)}
+.u023-sw{position:relative;width:52px;height:32px;flex:none;border:0;padding:0;border-radius:999px;background:var(--ux-surface-3);transition:background-color .4s var(--ux-ease)}
+.u023-sw::after{content:"";position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px -1px rgba(0,0,0,.3);transition:transform .5s var(--ux-spring),width .25s var(--ux-ease)}
+.u023-sw:active::after{width:32px}
+.u023-sw[aria-checked="true"]{background:var(--ux-mint)}
+.u023-sw[aria-checked="true"]::after{transform:translateX(20px)}
+.u023-sw[aria-checked="true"]:active::after{transform:translateX(14px)}
+.u023-sw:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u023-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ux-ease)}
+.u023-more.is-open{grid-template-rows:1fr}
+.u023-more>div{overflow:hidden;min-height:0}
+.u023-opts{position:relative;display:flex;margin:0 4px 16px 58px;padding:4px;border-radius:12px;background:var(--ux-surface-2);opacity:0;transform:translateY(-8px);transition:opacity .3s var(--ux-ease),transform .5s var(--ux-spring)}
+.u023-more.is-open .u023-opts{opacity:1;transform:none;transition-delay:.12s}
+.u023-pill{position:absolute;left:4px;top:4px;bottom:4px;width:calc((100% - 8px) / 3);border-radius:9px;background:var(--ux-surface);box-shadow:0 1px 0 var(--ux-line),0 4px 10px -6px var(--ux-shadow-strong);transform:translateX(calc(var(--i,1) * 100%));transition:transform .5s var(--ux-spring)}
+.u023-opt{position:relative;flex:1;height:34px;border:0;background:none;border-radius:9px;font-size:13.5px;font-weight:650;color:var(--ux-ink-3);transition:color .3s var(--ux-ease)}
+.u023-opt[aria-checked="true"]{color:var(--ux-ink)}
+.u023-opt:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u023-all{margin-top:auto;height:48px;border:0;border-radius:15px;background:var(--ux-surface-2);font-size:14.5px;font-weight:680;color:var(--ux-ink-2);transition:background-color .3s var(--ux-ease),color .3s var(--ux-ease),transform .4s var(--ux-spring)}
+.u023-all:hover{color:var(--ux-danger);background:color-mix(in srgb,var(--ux-danger) 10%,var(--ux-surface-2))}
+.u023-all:active{transform:scale(.98)}
+.u023-all:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u023">
+  <div class="u023-top"><b>알림 설정</b><span class="u023-badge" aria-live="polite">2개 켜짐</span></div>
+  <div class="u023-item">
+    <div class="u023-head">
+      <span class="u023-ic" style="--g:linear-gradient(140deg,#FF8A65,#FF5A6E)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15zM10 20.5a2.2 2.2 0 0 0 4 0"/></svg></span>
+      <div class="u023-t"><b>푸시 알림</b><small>멘션과 답글만 알려요</small></div>
+      <button class="u023-sw" type="button" role="switch" aria-checked="true" aria-label="푸시 알림"></button>
+    </div>
+  </div>
+  <div class="u023-item">
+    <div class="u023-head">
+      <span class="u023-ic" style="--g:linear-gradient(140deg,#5B8CFF,#3D6BFF)" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M4 7l8 6 8-6"/></svg></span>
+      <div class="u023-t"><b>이메일 요약</b><small class="u023-mail">꺼져 있어요</small></div>
+      <button class="u023-sw" type="button" role="switch" aria-checked="false" aria-label="이메일 요약" data-more></button>
+    </div>
+    <div class="u023-more">
+      <div>
+        <div class="u023-opts" role="radiogroup" aria-label="요약 주기">
+          <span class="u023-pill" aria-hidden="true"></span>
+          <button class="u023-opt" type="button" role="radio" aria-checked="false">매일</button>
+          <button class="u023-opt" type="button" role="radio" aria-checked="true">매주</button>
+          <button class="u023-opt" type="button" role="radio" aria-checked="false">매월</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="u023-item">
+    <div class="u023-head">
+      <span class="u023-ic" style="--g:linear-gradient(140deg,#22C3A6,#119C72)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4.5h11l3 3V19a.5.5 0 0 1-.5.5h-13A.5.5 0 0 1 5 19z"/><path d="M8 4.5V9h7V4.5M8 19.5v-5h8v5"/></svg></span>
+      <div class="u023-t"><b>자동 저장</b><small>30초마다 저장해요</small></div>
+      <button class="u023-sw" type="button" role="switch" aria-checked="true" aria-label="자동 저장"></button>
+    </div>
+  </div>
+  <button class="u023-all" type="button">모두 끄기</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sws = Array.prototype.slice.call(root.querySelectorAll('.u023-sw'));
+  var more = root.querySelector('.u023-more');
+  var mail = root.querySelector('.u023-mail');
+  var opts = Array.prototype.slice.call(root.querySelectorAll('.u023-opt'));
+  var pill = root.querySelector('.u023-pill');
+  var badge = root.querySelector('.u023-badge');
+  var all = root.querySelector('.u023-all');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var freq = 1;
+  function setSw(sw, on) {
+    sw.setAttribute('aria-checked', String(on));
+    sw.closest('.u023-item').classList.toggle('is-off', !on);
+    if (sw.hasAttribute('data-more')) {
+      more.classList.toggle('is-open', on);
+      mail.textContent = on ? opts[freq].textContent + ' 아침 8시에 보내요' : '꺼져 있어요';
+      opts.forEach(function (o) { o.tabIndex = on && o.getAttribute('aria-checked') === 'true' ? 0 : -1; });
+    }
+    var n = sws.filter(function (s) { return s.getAttribute('aria-checked') === 'true'; }).length;
+    badge.textContent = n ? n + '개 켜짐' : '모두 꺼짐';
+  }
+  sws.forEach(function (sw) {
+    setSw(sw, sw.getAttribute('aria-checked') === 'true');
+    sw.addEventListener('click', function () { setSw(sw, sw.getAttribute('aria-checked') !== 'true'); });
+  });
+  function pick(i, focus) {
+    freq = i;
+    opts.forEach(function (o, k) { o.setAttribute('aria-checked', String(k === i)); o.tabIndex = k === i ? 0 : -1; });
+    pill.style.setProperty('--i', i);
+    mail.textContent = opts[i].textContent + ' 아침 8시에 보내요';
+    if (focus) opts[i].focus();
+  }
+  opts.forEach(function (o, i) {
+    o.addEventListener('click', function () { pick(i); });
+    o.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { e.preventDefault(); pick((i + d + 3) % 3, true); }
+    });
+  });
+  // 모두 끄기: 위에서부터 0.12초 간격으로 차례차례 끕니다
+  all.addEventListener('click', function () {
+    sws.forEach(function (sw, i) {
+      setTimeout(function () { if (root.isConnected) setSw(sw, false); }, rm ? 0 : i * 120);
+    });
+  });
+})();
+</script>
+</div></div></figure><figure class="cell t-fix flip"><figcaption><b>보정판</b><span>토큰 여섯 개만 보정</span></figcaption><div class="stage" data-el="023" style="--h:420px" role="group" aria-label="보정판: 023"><div class="fit">
+<!-- Lucian UX/UI Prompt #023 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#023 -->
+<!--
+Element: 펼쳐지는 알림 설정
+ID: 023 · Category: 토글·선택 · Tags: settings, switch, list, expand, disclosure
+What it does: 스위치를 켜면 그 아래로 세부 옵션이 높이를 늘리며 펼쳐집니다. ‘모두 끄기’를 누르면 위에서부터 차례로 꺼지고, 꺼진 항목의 아이콘은 회색으로 가라앉습니다.
+How to use it: 이메일 요약을 켜서 주기를 골라 보고, 아래의 모두 끄기도 눌러 보세요
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#023
+-->
+<style>
+.u023{position:relative;display:flex;flex-direction:column;width:340px;height:420px;padding:22px 20px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u023-top{display:flex;align-items:center;justify-content:space-between;padding:0 4px 10px}
+.u023-top b{font-size:20px;font-weight:760;letter-spacing:-.035em}
+.u023-badge{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--ux-accent-soft);color:var(--ux-accent);font-variant-numeric:tabular-nums;transition:background-color .3s,color .3s}
+.u023-item{border-top:1px solid var(--ux-line)}
+.u023-head{display:flex;align-items:center;gap:14px;padding:14px 4px}
+.u023-ic{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;color:#fff;background:var(--g);transition:filter .5s var(--ux-ease),opacity .5s var(--ux-ease)}
+.u023-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.u023-item.is-off .u023-ic{filter:grayscale(1);opacity:.45}
+.u023-t{flex:1;min-width:0}
+.u023-t b{display:block;font-size:15.5px;font-weight:680;letter-spacing:-.02em}
+.u023-t small{display:block;margin-top:2px;font-size:13px;color:var(--ux-ink-3)}
+.u023-sw{position:relative;width:52px;height:32px;flex:none;border:0;padding:0;border-radius:999px;background:var(--ux-surface-3);transition:background-color .4s var(--ux-ease)}
+.u023-sw::after{content:"";position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px -1px rgba(0,0,0,.3);transition:transform .5s var(--ux-spring),width .25s var(--ux-ease)}
+.u023-sw:active::after{width:32px}
+.u023-sw[aria-checked="true"]{background:var(--ux-mint)}
+.u023-sw[aria-checked="true"]::after{transform:translateX(20px)}
+.u023-sw[aria-checked="true"]:active::after{transform:translateX(14px)}
+.u023-sw:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u023-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ux-ease)}
+.u023-more.is-open{grid-template-rows:1fr}
+.u023-more>div{overflow:hidden;min-height:0}
+.u023-opts{position:relative;display:flex;margin:0 4px 16px 58px;padding:4px;border-radius:12px;background:var(--ux-surface-2);opacity:0;transform:translateY(-8px);transition:opacity .3s var(--ux-ease),transform .5s var(--ux-spring)}
+.u023-more.is-open .u023-opts{opacity:1;transform:none;transition-delay:.12s}
+.u023-pill{position:absolute;left:4px;top:4px;bottom:4px;width:calc((100% - 8px) / 3);border-radius:9px;background:var(--ux-surface);box-shadow:0 1px 0 var(--ux-line),0 4px 10px -6px var(--ux-shadow-strong);transform:translateX(calc(var(--i,1) * 100%));transition:transform .5s var(--ux-spring)}
+.u023-opt{position:relative;flex:1;height:34px;border:0;background:none;border-radius:9px;font-size:13.5px;font-weight:650;color:var(--ux-ink-3);transition:color .3s var(--ux-ease)}
+.u023-opt[aria-checked="true"]{color:var(--ux-ink)}
+.u023-opt:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}
+.u023-all{margin-top:auto;height:48px;border:0;border-radius:15px;background:var(--ux-surface-2);font-size:14.5px;font-weight:680;color:var(--ux-ink-2);transition:background-color .3s var(--ux-ease),color .3s var(--ux-ease),transform .4s var(--ux-spring)}
+.u023-all:hover{color:var(--ux-danger);background:color-mix(in srgb,var(--ux-danger) 10%,var(--ux-surface-2))}
+.u023-all:active{transform:scale(.98)}
+.u023-all:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+</style>
+<div class="ux u023">
+  <div class="u023-top"><b>알림 설정</b><span class="u023-badge" aria-live="polite">2개 켜짐</span></div>
+  <div class="u023-item">
+    <div class="u023-head">
+      <span class="u023-ic" style="--g:linear-gradient(140deg,#FF8A65,#FF5A6E)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15zM10 20.5a2.2 2.2 0 0 0 4 0"/></svg></span>
+      <div class="u023-t"><b>푸시 알림</b><small>멘션과 답글만 알려요</small></div>
+      <button class="u023-sw" type="button" role="switch" aria-checked="true" aria-label="푸시 알림"></button>
+    </div>
+  </div>
+  <div class="u023-item">
+    <div class="u023-head">
+      <span class="u023-ic" style="--g:linear-gradient(140deg,#5B8CFF,#3D6BFF)" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"/><path d="M4 7l8 6 8-6"/></svg></span>
+      <div class="u023-t"><b>이메일 요약</b><small class="u023-mail">꺼져 있어요</small></div>
+      <button class="u023-sw" type="button" role="switch" aria-checked="false" aria-label="이메일 요약" data-more></button>
+    </div>
+    <div class="u023-more">
+      <div>
+        <div class="u023-opts" role="radiogroup" aria-label="요약 주기">
+          <span class="u023-pill" aria-hidden="true"></span>
+          <button class="u023-opt" type="button" role="radio" aria-checked="false">매일</button>
+          <button class="u023-opt" type="button" role="radio" aria-checked="true">매주</button>
+          <button class="u023-opt" type="button" role="radio" aria-checked="false">매월</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="u023-item">
+    <div class="u023-head">
+      <span class="u023-ic" style="--g:linear-gradient(140deg,#22C3A6,#119C72)" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4.5h11l3 3V19a.5.5 0 0 1-.5.5h-13A.5.5 0 0 1 5 19z"/><path d="M8 4.5V9h7V4.5M8 19.5v-5h8v5"/></svg></span>
+      <div class="u023-t"><b>자동 저장</b><small>30초마다 저장해요</small></div>
+      <button class="u023-sw" type="button" role="switch" aria-checked="true" aria-label="자동 저장"></button>
+    </div>
+  </div>
+  <button class="u023-all" type="button">모두 끄기</button>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sws = Array.prototype.slice.call(root.querySelectorAll('.u023-sw'));
+  var more = root.querySelector('.u023-more');
+  var mail = root.querySelector('.u023-mail');
+  var opts = Array.prototype.slice.call(root.querySelectorAll('.u023-opt'));
+  var pill = root.querySelector('.u023-pill');
+  var badge = root.querySelector('.u023-badge');
+  var all = root.querySelector('.u023-all');
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var freq = 1;
+  function setSw(sw, on) {
+    sw.setAttribute('aria-checked', String(on));
+    sw.closest('.u023-item').classList.toggle('is-off', !on);
+    if (sw.hasAttribute('data-more')) {
+      more.classList.toggle('is-open', on);
+      mail.textContent = on ? opts[freq].textContent + ' 아침 8시에 보내요' : '꺼져 있어요';
+      opts.forEach(function (o) { o.tabIndex = on && o.getAttribute('aria-checked') === 'true' ? 0 : -1; });
+    }
+    var n = sws.filter(function (s) { return s.getAttribute('aria-checked') === 'true'; }).length;
+    badge.textContent = n ? n + '개 켜짐' : '모두 꺼짐';
+  }
+  sws.forEach(function (sw) {
+    setSw(sw, sw.getAttribute('aria-checked') === 'true');
+    sw.addEventListener('click', function () { setSw(sw, sw.getAttribute('aria-checked') !== 'true'); });
+  });
+  function pick(i, focus) {
+    freq = i;
+    opts.forEach(function (o, k) { o.setAttribute('aria-checked', String(k === i)); o.tabIndex = k === i ? 0 : -1; });
+    pill.style.setProperty('--i', i);
+    mail.textContent = opts[i].textContent + ' 아침 8시에 보내요';
+    if (focus) opts[i].focus();
+  }
+  opts.forEach(function (o, i) {
+    o.addEventListener('click', function () { pick(i); });
+    o.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { e.preventDefault(); pick((i + d + 3) % 3, true); }
+    });
+  });
+  // 모두 끄기: 위에서부터 0.12초 간격으로 차례차례 끕니다
+  all.addEventListener('click', function () {
+    sws.forEach(function (sw, i) {
+      setTimeout(function () { if (root.isConnected) setSw(sw, false); }, rm ? 0 : i * 120);
+    });
+  });
+})();
+</script>
+</div></div></figure></div></article><article class="row" data-row="042"><div class="row-head"><div class="row-title"><h3><span class="num">042</span>단계 진행 마법사</h3><p class="look">작은 설명 글자와 아직 오지 않은 단계의 번호, 현재 단계의 보라, 마지막 단계의 큰 체크와 ‘시작하기’ 단추의 초록이 바뀝니다. 진행선의 그라디언트는 그대로입니다.</p><p class="fixed">셋째 단계에 있는 프로필 동그라미 두 개의 색은 요소 코드에 적혀 있습니다.</p></div><div class="row-ctl"><button type="button" class="btn btn-ink" data-play="042">같은 동작 보기</button><button type="button" class="btn" data-reset="042">처음 상태로</button></div></div><div class="cells"><figure class="cell t-orig"><figcaption><b>원본</b><span>Lucian 기본값 그대로</span></figcaption><div class="stage" data-el="042" style="--h:400px" role="group" aria-label="원본: 042"><div class="fit">
+<!-- Lucian UX/UI Prompt #042 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#042 -->
+<!--
+Element: 단계 진행 마법사
+ID: 042 · Category: 메뉴·탭 · Tags: stepper, wizard, onboarding, progress, steps
+What it does: 다음을 누르면 진행선이 다음 동그라미까지 차오르고, 지난 단계는 체크로 바뀝니다. 본문은 진행 방향으로 밀려 바뀌며, 마지막 단계에서는 버튼이 ‘시작하기’로 바뀝니다.
+How to use it: 다음과 이전을 눌러 단계를 오가 보세요. 위쪽의 지난 단계 동그라미를 눌러도 돌아갑니다
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#042
+-->
+<style>
+.u042{position:relative;width:350px;height:400px;display:flex;flex-direction:column;padding:22px 20px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u042-steps{position:relative;display:flex;justify-content:space-between;margin:0 6px;padding:0;list-style:none}
+.u042-line{position:absolute;left:17px;right:17px;top:16px;height:3px;border-radius:2px;background:var(--ux-surface-3)}
+.u042-line i{position:absolute;inset:0;border-radius:inherit;background:var(--ux-grad);transform-origin:0 50%;transform:scaleX(var(--p,0));transition:transform .6s var(--ux-ease)}
+.u042-st{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;width:34px}
+.u042-dot{position:relative;width:34px;height:34px;border:0;padding:0;border-radius:50%;background:var(--ux-surface);box-shadow:inset 0 0 0 2px var(--ux-line-2);font-size:13.5px;font-weight:780;color:var(--ux-ink-3);display:grid;place-items:center;transition:box-shadow .35s,background-color .35s,color .35s,transform .45s var(--ux-spring)}
+.u042-dot:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u042-dot svg{position:absolute;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.u042-dot path{stroke-dasharray:16;stroke-dashoffset:16;transition:stroke-dashoffset .35s var(--ux-ease) .1s}
+.u042-st.cur .u042-dot{box-shadow:inset 0 0 0 2px var(--ux-accent),0 0 0 5px var(--ux-accent-soft);color:var(--ux-accent);transform:scale(1.08)}
+.u042-st.done .u042-dot{background:var(--ux-accent);box-shadow:none;color:var(--ux-accent-ink);cursor:pointer}
+.u042-st.done .u042-dot span{opacity:0}
+.u042-st.done .u042-dot svg{opacity:1}
+.u042-st.done .u042-dot path{stroke-dashoffset:0}
+.u042-st small{font-size:11.5px;font-weight:700;color:var(--ux-ink-3);white-space:nowrap;transition:color .3s}
+.u042-st.cur small,.u042-st.done small{color:var(--ux-ink)}
+.u042-view{position:relative;flex:1;margin-top:22px;overflow:hidden}
+.u042-pane{position:absolute;inset:0;transition:transform .55s var(--ux-ease),opacity .35s var(--ux-ease)}
+.u042-pane h4{margin:0;font-size:19px;font-weight:780;letter-spacing:-.03em}
+.u042-pane p{margin:5px 0 16px;font-size:13.5px;color:var(--ux-ink-3)}
+.u042-fld{display:flex;align-items:center;gap:10px;height:50px;padding:0 14px;border-radius:14px;background:var(--ux-surface-2);font-size:15px;font-weight:620;margin-bottom:8px}
+.u042-url{color:var(--ux-ink-3);font-weight:560}
+.u042-url b{color:var(--ux-ink);font-weight:700}
+.u042-fld small{margin-left:auto;font-size:12px;color:var(--ux-ink-3)}
+.u042-chips{display:flex;gap:6px}
+.u042-chips span{padding:8px 12px;border-radius:999px;font-size:13px;font-weight:650;box-shadow:inset 0 0 0 1px var(--ux-line-2);color:var(--ux-ink-2)}
+.u042-chips span.on{background:var(--ux-ink);color:var(--ux-page);box-shadow:none}
+.u042-av{width:30px;height:30px;flex:none;border-radius:50%;background:var(--c)}
+.u042-done{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center}
+.u042-big{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:var(--ux-mint);color:var(--ux-accent-ink);box-shadow:0 0 0 10px color-mix(in srgb,var(--ux-mint) 18%,transparent);transform:scale(.5);transition:transform .6s var(--ux-spring) .2s}
+.u042-big svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u042-pane.on .u042-big{transform:none}
+.u042-done h4{margin-top:18px}
+.u042-foot{display:flex;gap:8px;margin-top:12px}
+.u042-b{height:50px;border:0;border-radius:15px;font-size:15px;font-weight:700;transition:transform .35s var(--ux-spring),opacity .3s,background-color .3s}
+.u042-b:active{transform:scale(.96)}
+.u042-b:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u042-prev{width:96px;background:var(--ux-surface-2);color:var(--ux-ink)}
+.u042-prev[aria-disabled="true"]{opacity:.35}
+.u042-next{flex:1;background:var(--ux-ink);color:var(--ux-page)}
+.u042.is-last .u042-next{background:var(--ux-mint);color:var(--ux-accent-ink)}
+</style>
+<div class="ux u042">
+  <ol class="u042-steps" aria-label="가입 단계">
+    <li class="u042-line" aria-hidden="true"><i></i></li>
+    <li class="u042-st"><button class="u042-dot" type="button" tabindex="-1"><span>1</span><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></button><small>계정</small></li>
+    <li class="u042-st"><button class="u042-dot" type="button" tabindex="-1"><span>2</span><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></button><small>작업 공간</small></li>
+    <li class="u042-st"><button class="u042-dot" type="button" tabindex="-1"><span>3</span><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></button><small>초대</small></li>
+    <li class="u042-st"><button class="u042-dot" type="button" tabindex="-1"><span>4</span><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></button><small>완료</small></li>
+  </ol>
+  <div class="u042-view" aria-live="polite">
+    <section class="u042-pane"><h4>어떻게 불러 드릴까요?</h4><p>팀원에게 보이는 이름이에요</p><div class="u042-fld">김서연<small>이름</small></div><div class="u042-chips"><span class="on">디자이너</span><span>개발자</span><span>기획자</span></div></section>
+    <section class="u042-pane"><h4>작업 공간을 만들어요</h4><p>나중에 언제든 바꿀 수 있어요</p><div class="u042-fld">Lumen 디자인<small>이름</small></div><div class="u042-fld"><span class="u042-url">lumen.app/<b>design</b></span><small>주소</small></div></section>
+    <section class="u042-pane"><h4>함께할 사람을 초대해요</h4><p>초대 메일은 바로 발송돼요</p><div class="u042-fld"><span class="u042-av" style="--c:linear-gradient(140deg,#FFB547,#FF7A45)"></span>jun@example.com<small>편집자</small></div><div class="u042-fld"><span class="u042-av" style="--c:linear-gradient(140deg,#22C3A6,#0EA5E9)"></span>mina@example.com<small>보기</small></div></section>
+    <section class="u042-pane"><div class="u042-done"><span class="u042-big"><svg viewBox="0 0 34 34"><path d="M9 17.5l5.5 5.5L25.5 12"/></svg></span><h4>준비가 끝났어요</h4><p>Lumen 디자인에 오신 걸 환영해요</p></div></section>
+  </div>
+  <div class="u042-foot"><button class="u042-b u042-prev" type="button">이전</button><button class="u042-b u042-next" type="button">다음</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sts = Array.prototype.slice.call(root.querySelectorAll('.u042-st'));
+  var panes = Array.prototype.slice.call(root.querySelectorAll('.u042-pane'));
+  var line = root.querySelector('.u042-line i');
+  var prev = root.querySelector('.u042-prev'), next = root.querySelector('.u042-next');
+  var cur = -1;
+  // 본문은 나아가는 방향으로 밀려 바뀌고, 진행선은 현재 단계까지 차오릅니다
+  function go(i) {
+    if (i < 0 || i > 3 || i === cur) return;
+    var dir = i > cur ? 1 : -1;
+    panes.forEach(function (p, k) {
+      p.classList.toggle('on', k === i);
+      p.setAttribute('aria-hidden', String(k !== i));
+      p.style.opacity = k === i ? '1' : '0';
+      p.style.transform = k === i ? 'none' : 'translateX(' + (k < i ? -40 : 40) + '%)';
+      if (k === i && cur >= 0) {
+        p.style.transition = 'none';
+        p.style.transform = 'translateX(' + (dir * 40) + '%)'; p.style.opacity = '0';
+        void p.offsetWidth;
+        p.style.transition = '';
+        p.style.transform = 'none'; p.style.opacity = '1';
+      }
+    });
+    cur = i;
+    sts.forEach(function (s, k) {
+      s.classList.toggle('done', k < i);
+      s.classList.toggle('cur', k === i);
+      var d = s.querySelector('.u042-dot');
+      d.tabIndex = k < i ? 0 : -1;
+      d.setAttribute('aria-label', (k + 1) + '단계 ' + s.querySelector('small').textContent + (k < i ? ', 완료. 눌러서 돌아가기' : k === i ? ', 현재 단계' : ''));
+      if (k === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+    });
+    line.parentNode.style.setProperty('--p', (i / 3).toFixed(3));
+    prev.setAttribute('aria-disabled', String(i === 0));
+    root.classList.toggle('is-last', i === 3);
+    next.textContent = i === 3 ? '시작하기' : '다음';
+  }
+  next.addEventListener('click', function () {
+    if (cur === 3) { next.textContent = '환영해요!'; setTimeout(function () { if (root.isConnected) go(0); }, 900); return; }
+    go(cur + 1);
+  });
+  prev.addEventListener('click', function () { go(cur - 1); });
+  sts.forEach(function (s, k) { s.querySelector('.u042-dot').addEventListener('click', function () { if (k < cur) go(k); }); });
+  go(0);
+})();
+</script>
+</div></div></figure><figure class="cell t-fix flip"><figcaption><b>보정판</b><span>토큰 여섯 개만 보정</span></figcaption><div class="stage" data-el="042" style="--h:400px" role="group" aria-label="보정판: 042"><div class="fit">
+<!-- Lucian UX/UI Prompt #042 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#042 -->
+<!--
+Element: 단계 진행 마법사
+ID: 042 · Category: 메뉴·탭 · Tags: stepper, wizard, onboarding, progress, steps
+What it does: 다음을 누르면 진행선이 다음 동그라미까지 차오르고, 지난 단계는 체크로 바뀝니다. 본문은 진행 방향으로 밀려 바뀌며, 마지막 단계에서는 버튼이 ‘시작하기’로 바뀝니다.
+How to use it: 다음과 이전을 눌러 단계를 오가 보세요. 위쪽의 지난 단계 동그라미를 눌러도 돌아갑니다
+Footprint: fixed size, square
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#042
+-->
+<style>
+.u042{position:relative;width:350px;height:400px;display:flex;flex-direction:column;padding:22px 20px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}
+.u042-steps{position:relative;display:flex;justify-content:space-between;margin:0 6px;padding:0;list-style:none}
+.u042-line{position:absolute;left:17px;right:17px;top:16px;height:3px;border-radius:2px;background:var(--ux-surface-3)}
+.u042-line i{position:absolute;inset:0;border-radius:inherit;background:var(--ux-grad);transform-origin:0 50%;transform:scaleX(var(--p,0));transition:transform .6s var(--ux-ease)}
+.u042-st{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;width:34px}
+.u042-dot{position:relative;width:34px;height:34px;border:0;padding:0;border-radius:50%;background:var(--ux-surface);box-shadow:inset 0 0 0 2px var(--ux-line-2);font-size:13.5px;font-weight:780;color:var(--ux-ink-3);display:grid;place-items:center;transition:box-shadow .35s,background-color .35s,color .35s,transform .45s var(--ux-spring)}
+.u042-dot:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}
+.u042-dot svg{position:absolute;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.u042-dot path{stroke-dasharray:16;stroke-dashoffset:16;transition:stroke-dashoffset .35s var(--ux-ease) .1s}
+.u042-st.cur .u042-dot{box-shadow:inset 0 0 0 2px var(--ux-accent),0 0 0 5px var(--ux-accent-soft);color:var(--ux-accent);transform:scale(1.08)}
+.u042-st.done .u042-dot{background:var(--ux-accent);box-shadow:none;color:var(--ux-accent-ink);cursor:pointer}
+.u042-st.done .u042-dot span{opacity:0}
+.u042-st.done .u042-dot svg{opacity:1}
+.u042-st.done .u042-dot path{stroke-dashoffset:0}
+.u042-st small{font-size:11.5px;font-weight:700;color:var(--ux-ink-3);white-space:nowrap;transition:color .3s}
+.u042-st.cur small,.u042-st.done small{color:var(--ux-ink)}
+.u042-view{position:relative;flex:1;margin-top:22px;overflow:hidden}
+.u042-pane{position:absolute;inset:0;transition:transform .55s var(--ux-ease),opacity .35s var(--ux-ease)}
+.u042-pane h4{margin:0;font-size:19px;font-weight:780;letter-spacing:-.03em}
+.u042-pane p{margin:5px 0 16px;font-size:13.5px;color:var(--ux-ink-3)}
+.u042-fld{display:flex;align-items:center;gap:10px;height:50px;padding:0 14px;border-radius:14px;background:var(--ux-surface-2);font-size:15px;font-weight:620;margin-bottom:8px}
+.u042-url{color:var(--ux-ink-3);font-weight:560}
+.u042-url b{color:var(--ux-ink);font-weight:700}
+.u042-fld small{margin-left:auto;font-size:12px;color:var(--ux-ink-3)}
+.u042-chips{display:flex;gap:6px}
+.u042-chips span{padding:8px 12px;border-radius:999px;font-size:13px;font-weight:650;box-shadow:inset 0 0 0 1px var(--ux-line-2);color:var(--ux-ink-2)}
+.u042-chips span.on{background:var(--ux-ink);color:var(--ux-page);box-shadow:none}
+.u042-av{width:30px;height:30px;flex:none;border-radius:50%;background:var(--c)}
+.u042-done{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center}
+.u042-big{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:var(--ux-mint);color:var(--ux-accent-ink);box-shadow:0 0 0 10px color-mix(in srgb,var(--ux-mint) 18%,transparent);transform:scale(.5);transition:transform .6s var(--ux-spring) .2s}
+.u042-big svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.u042-pane.on .u042-big{transform:none}
+.u042-done h4{margin-top:18px}
+.u042-foot{display:flex;gap:8px;margin-top:12px}
+.u042-b{height:50px;border:0;border-radius:15px;font-size:15px;font-weight:700;transition:transform .35s var(--ux-spring),opacity .3s,background-color .3s}
+.u042-b:active{transform:scale(.96)}
+.u042-b:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u042-prev{width:96px;background:var(--ux-surface-2);color:var(--ux-ink)}
+.u042-prev[aria-disabled="true"]{opacity:.35}
+.u042-next{flex:1;background:var(--ux-ink);color:var(--ux-page)}
+.u042.is-last .u042-next{background:var(--ux-mint);color:var(--ux-accent-ink)}
+</style>
+<div class="ux u042">
+  <ol class="u042-steps" aria-label="가입 단계">
+    <li class="u042-line" aria-hidden="true"><i></i></li>
+    <li class="u042-st"><button class="u042-dot" type="button" tabindex="-1"><span>1</span><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></button><small>계정</small></li>
+    <li class="u042-st"><button class="u042-dot" type="button" tabindex="-1"><span>2</span><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></button><small>작업 공간</small></li>
+    <li class="u042-st"><button class="u042-dot" type="button" tabindex="-1"><span>3</span><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></button><small>초대</small></li>
+    <li class="u042-st"><button class="u042-dot" type="button" tabindex="-1"><span>4</span><svg viewBox="0 0 16 16"><path d="M3.5 8.4l3 3 6-6.4"/></svg></button><small>완료</small></li>
+  </ol>
+  <div class="u042-view" aria-live="polite">
+    <section class="u042-pane"><h4>어떻게 불러 드릴까요?</h4><p>팀원에게 보이는 이름이에요</p><div class="u042-fld">김서연<small>이름</small></div><div class="u042-chips"><span class="on">디자이너</span><span>개발자</span><span>기획자</span></div></section>
+    <section class="u042-pane"><h4>작업 공간을 만들어요</h4><p>나중에 언제든 바꿀 수 있어요</p><div class="u042-fld">Lumen 디자인<small>이름</small></div><div class="u042-fld"><span class="u042-url">lumen.app/<b>design</b></span><small>주소</small></div></section>
+    <section class="u042-pane"><h4>함께할 사람을 초대해요</h4><p>초대 메일은 바로 발송돼요</p><div class="u042-fld"><span class="u042-av" style="--c:linear-gradient(140deg,#FFB547,#FF7A45)"></span>jun@example.com<small>편집자</small></div><div class="u042-fld"><span class="u042-av" style="--c:linear-gradient(140deg,#22C3A6,#0EA5E9)"></span>mina@example.com<small>보기</small></div></section>
+    <section class="u042-pane"><div class="u042-done"><span class="u042-big"><svg viewBox="0 0 34 34"><path d="M9 17.5l5.5 5.5L25.5 12"/></svg></span><h4>준비가 끝났어요</h4><p>Lumen 디자인에 오신 걸 환영해요</p></div></section>
+  </div>
+  <div class="u042-foot"><button class="u042-b u042-prev" type="button">이전</button><button class="u042-b u042-next" type="button">다음</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var sts = Array.prototype.slice.call(root.querySelectorAll('.u042-st'));
+  var panes = Array.prototype.slice.call(root.querySelectorAll('.u042-pane'));
+  var line = root.querySelector('.u042-line i');
+  var prev = root.querySelector('.u042-prev'), next = root.querySelector('.u042-next');
+  var cur = -1;
+  // 본문은 나아가는 방향으로 밀려 바뀌고, 진행선은 현재 단계까지 차오릅니다
+  function go(i) {
+    if (i < 0 || i > 3 || i === cur) return;
+    var dir = i > cur ? 1 : -1;
+    panes.forEach(function (p, k) {
+      p.classList.toggle('on', k === i);
+      p.setAttribute('aria-hidden', String(k !== i));
+      p.style.opacity = k === i ? '1' : '0';
+      p.style.transform = k === i ? 'none' : 'translateX(' + (k < i ? -40 : 40) + '%)';
+      if (k === i && cur >= 0) {
+        p.style.transition = 'none';
+        p.style.transform = 'translateX(' + (dir * 40) + '%)'; p.style.opacity = '0';
+        void p.offsetWidth;
+        p.style.transition = '';
+        p.style.transform = 'none'; p.style.opacity = '1';
+      }
+    });
+    cur = i;
+    sts.forEach(function (s, k) {
+      s.classList.toggle('done', k < i);
+      s.classList.toggle('cur', k === i);
+      var d = s.querySelector('.u042-dot');
+      d.tabIndex = k < i ? 0 : -1;
+      d.setAttribute('aria-label', (k + 1) + '단계 ' + s.querySelector('small').textContent + (k < i ? ', 완료. 눌러서 돌아가기' : k === i ? ', 현재 단계' : ''));
+      if (k === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');
+    });
+    line.parentNode.style.setProperty('--p', (i / 3).toFixed(3));
+    prev.setAttribute('aria-disabled', String(i === 0));
+    root.classList.toggle('is-last', i === 3);
+    next.textContent = i === 3 ? '시작하기' : '다음';
+  }
+  next.addEventListener('click', function () {
+    if (cur === 3) { next.textContent = '환영해요!'; setTimeout(function () { if (root.isConnected) go(0); }, 900); return; }
+    go(cur + 1);
+  });
+  prev.addEventListener('click', function () { go(cur - 1); });
+  sts.forEach(function (s, k) { s.querySelector('.u042-dot').addEventListener('click', function () { if (k < cur) go(k); }); });
+  go(0);
+})();
+</script>
+</div></div></figure></div></article><article class="row" data-row="072"><div class="row-head"><div class="row-title"><h3><span class="num">072</span>접히는 인라인 알림</h3><p class="look">네 알림 줄의 색(위로부터 위험, 경고, 강조, 완료)과 ‘알림 4개’ 같은 작은 글자가 바뀝니다.</p><p class="fixed">직접 적은 색은 없습니다.</p></div><div class="row-ctl"><button type="button" class="btn btn-ink" data-play="072">같은 동작 보기</button><button type="button" class="btn" data-reset="072">처음 상태로</button></div></div><div class="cells"><figure class="cell t-orig"><figcaption><b>원본</b><span>Lucian 기본값 그대로</span></figcaption><div class="stage" data-el="072" style="--h:470px" role="group" aria-label="원본: 072"><div class="fit">
+<!-- Lucian UX/UI Prompt #072 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#072 -->
+<!--
+Element: 접히는 인라인 알림
+ID: 072 · Category: 알림·피드백 · Tags: alert, inline, dismiss, collapse, status
+What it does: 종류마다 색과 아이콘이 다른 알림 줄이 쌓여 있습니다. 닫으면 옆으로 밀려나며 높이가 접히고 아래 줄이 올라와 자리를 채웁니다. 오류 알림은 ‘자세히’를 눌러 기록을 펼칠 수 있고, 모두 닫으면 다시 불러오기 버튼이 나타납니다.
+How to use it: 각 알림의 ×를 눌러 닫아 보고, 오류 알림의 ‘자세히’로 기록을 펼쳐 보세요. 모두 닫은 뒤 ‘알림 다시 보기’로 되돌릴 수 있습니다
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#072
+-->
+<style>
+.u072{position:relative;width:340px;height:470px;display:flex;flex-direction:column;padding:20px 16px 16px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u072-head{display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 12px}
+.u072-head b{font-size:20px;font-weight:850;letter-spacing:-.045em}
+.u072-head small{font-size:12.5px;font-weight:700;color:var(--ux-ink-3)}
+.u072-list{margin:0;padding:0;list-style:none}
+.u072-it{display:grid;grid-template-rows:1fr;transition:grid-template-rows .45s var(--ux-ease) .12s,margin .45s var(--ux-ease) .12s;margin-bottom:8px}
+.u072-it>div{min-height:0;overflow:hidden}
+.u072-it.gone{grid-template-rows:0fr;margin-bottom:0}
+.u072-a{position:relative;display:flex;gap:12px;padding:14px 12px 14px 14px;border-radius:18px;background:color-mix(in srgb,var(--c) 10%,var(--ux-surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 22%,transparent);transition:transform .4s var(--ux-ease),opacity .3s}
+.u072-a::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--c)}
+.u072-it.gone .u072-a{transform:translateX(40px);opacity:0}
+.u072-ic{width:28px;height:28px;flex:none;border-radius:9px;display:grid;place-items:center;background:var(--c);color:var(--ux-accent-ink)}
+.u072-ic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u072-tx{flex:1;min-width:0}
+.u072-tx b{display:block;font-size:14px;font-weight:780;letter-spacing:-.02em}
+.u072-tx p{margin:3px 0 0;font-size:12.5px;line-height:1.5;color:var(--ux-ink-2)}
+.u072-more{margin-top:8px;border:0;padding:0;background:none;display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:750;color:var(--c)}
+.u072-more svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;transition:transform .35s var(--ux-spring)}
+.u072-more[aria-expanded="true"] svg{transform:rotate(180deg)}
+.u072-log{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ux-ease)}
+.u072-log.on{grid-template-rows:1fr}
+.u072-log>div{min-height:0;overflow:hidden}
+.u072-log code{display:block;margin-top:8px;padding:10px;border-radius:10px;background:var(--ux-surface);font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ux-ink-2);white-space:pre;overflow-x:auto}
+.u072-prog{height:5px;margin-top:8px;border-radius:3px;background:color-mix(in srgb,var(--c) 18%,transparent);overflow:hidden}
+.u072-prog i{display:block;height:100%;width:72%;border-radius:inherit;background:var(--c)}
+.u072-x{width:28px;height:28px;flex:none;margin:-2px -2px 0 0;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:none;color:var(--ux-ink-3);transition:background-color .2s,color .2s,transform .3s var(--ux-spring)}
+.u072-x:hover{background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ux-ink)}
+.u072-x:active{transform:scale(.85)}
+.u072-x svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.u072-x:focus-visible,.u072-more:focus-visible,.u072-again:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u072-calm{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;text-align:center;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .4s .3s,transform .5s var(--ux-spring) .3s}
+.u072.is-clear .u072-calm{opacity:1;transform:none;pointer-events:auto}
+.u072-calm i{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--ux-mint) 15%,transparent);color:var(--ux-mint)}
+.u072-calm i svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.u072-calm b{font-size:15px;font-weight:800}
+.u072-again{height:40px;padding:0 16px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:13px;font-weight:720;color:var(--ux-ink)}
+</style>
+<div class="ux u072">
+  <div class="u072-head"><b>시스템 상태</b><small class="u072-n" aria-live="polite"></small></div>
+  <ul class="u072-list">
+    <li class="u072-it"><div><div class="u072-a" role="alert" style="--c:var(--ux-danger)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 4.5v4M8 11.2h.01"/></svg></span><div class="u072-tx"><b>결제 웹훅이 실패했어요</b><p>최근 3번의 요청이 응답하지 않았어요.</p><button class="u072-more" type="button" aria-expanded="false">자세히 <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button><div class="u072-log"><div><code>09:41:02  /hooks/pay  504
+09:41:32  /hooks/pay  504
+09:42:02  /hooks/pay  504</code></div></div></div><button class="u072-x" type="button" aria-label="결제 웹훅 알림 닫기"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+    <li class="u072-it"><div><div class="u072-a" role="status" style="--c:var(--ux-warn)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 2.5l6 10.5H2zM8 7v2.5M8 11.3h.01"/></svg></span><div class="u072-tx"><b>저장 공간 72% 사용 중</b><p>90%를 넘으면 새 업로드가 멈춰요.</p><div class="u072-prog" aria-hidden="true"><i></i></div></div><button class="u072-x" type="button" aria-label="저장 공간 알림 닫기"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+    <li class="u072-it"><div><div class="u072-a" role="status" style="--c:var(--ux-accent)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 7.5v4M8 4.8h.01"/></svg></span><div class="u072-tx"><b>새 버전 2.4가 나왔어요</b><p>다크 모드 대비가 좋아졌어요.</p></div><button class="u072-x" type="button" aria-label="새 버전 알림 닫기"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+    <li class="u072-it"><div><div class="u072-a" role="status" style="--c:var(--ux-mint)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 8.4l2.6 2.6L12 5.5"/></svg></span><div class="u072-tx"><b>백업을 마쳤어요</b><p>오늘 오전 4:00 · 12.8GB</p></div><button class="u072-x" type="button" aria-label="백업 알림 닫기"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+  </ul>
+  <div class="u072-calm" aria-hidden="true"><i><svg viewBox="0 0 26 26"><path d="M7 13.5l4 4L19 9"/></svg></i><b>확인할 알림이 없어요</b><button class="u072-again" type="button" tabindex="-1">알림 다시 보기</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var its = Array.prototype.slice.call(root.querySelectorAll('.u072-it')), n = root.querySelector('.u072-n');
+  var calm = root.querySelector('.u072-calm'), again = root.querySelector('.u072-again'), more = root.querySelector('.u072-more'), log = root.querySelector('.u072-log');
+  function count() {
+    var k = its.filter(function (it) { return !it.classList.contains('gone'); }).length;
+    n.textContent = k ? '알림 ' + k + '개' : '';
+    root.classList.toggle('is-clear', !k);
+    calm.setAttribute('aria-hidden', String(!!k));
+    again.tabIndex = k ? -1 : 0;
+    return k;
+  }
+  // 닫으면 먼저 옆으로 밀려나고, 이어서 높이가 접히며 아래 줄이 올라옵니다
+  its.forEach(function (it, i) {
+    it.querySelector('.u072-x').addEventListener('click', function () {
+      it.classList.add('gone'); it.inert = true;
+      var rest = its.filter(function (x) { return !x.classList.contains('gone'); });
+      var next = rest.filter(function (x) { return its.indexOf(x) > i; })[0] || rest[rest.length - 1];
+      if (count() && next) next.querySelector('.u072-x').focus({ preventScroll: true });
+      else setTimeout(function () { if (root.isConnected) again.focus({ preventScroll: true }); }, 500);
+    });
+  });
+  more.addEventListener('click', function () {
+    var on = more.getAttribute('aria-expanded') !== 'true';
+    more.setAttribute('aria-expanded', String(on));
+    more.firstChild.textContent = on ? '접기 ' : '자세히 ';
+    log.classList.toggle('on', on);
+  });
+  again.addEventListener('click', function () {
+    its.forEach(function (it, i) { setTimeout(function () { if (!root.isConnected) return; it.classList.remove('gone'); it.inert = false; if (i === its.length - 1) count(); }, i * 90); });
+    root.classList.remove('is-clear');
+    setTimeout(function () { if (root.isConnected) its[0].querySelector('.u072-x').focus({ preventScroll: true }); }, 200);
+  });
+  count();
+})();
+</script>
+</div></div></figure><figure class="cell t-fix flip"><figcaption><b>보정판</b><span>토큰 여섯 개만 보정</span></figcaption><div class="stage" data-el="072" style="--h:470px" role="group" aria-label="보정판: 072"><div class="fit">
+<!-- Lucian UX/UI Prompt #072 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#072 -->
+<!--
+Element: 접히는 인라인 알림
+ID: 072 · Category: 알림·피드백 · Tags: alert, inline, dismiss, collapse, status
+What it does: 종류마다 색과 아이콘이 다른 알림 줄이 쌓여 있습니다. 닫으면 옆으로 밀려나며 높이가 접히고 아래 줄이 올라와 자리를 채웁니다. 오류 알림은 ‘자세히’를 눌러 기록을 펼칠 수 있고, 모두 닫으면 다시 불러오기 버튼이 나타납니다.
+How to use it: 각 알림의 ×를 눌러 닫아 보고, 오류 알림의 ‘자세히’로 기록을 펼쳐 보세요. 모두 닫은 뒤 ‘알림 다시 보기’로 되돌릴 수 있습니다
+Footprint: fixed size, tall
+Needs: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.
+Live demo: https://lucianlabs.dev/uxui-prompt/#072
+-->
+<style>
+.u072{position:relative;width:340px;height:470px;display:flex;flex-direction:column;padding:20px 16px 16px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}
+.u072-head{display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 12px}
+.u072-head b{font-size:20px;font-weight:850;letter-spacing:-.045em}
+.u072-head small{font-size:12.5px;font-weight:700;color:var(--ux-ink-3)}
+.u072-list{margin:0;padding:0;list-style:none}
+.u072-it{display:grid;grid-template-rows:1fr;transition:grid-template-rows .45s var(--ux-ease) .12s,margin .45s var(--ux-ease) .12s;margin-bottom:8px}
+.u072-it>div{min-height:0;overflow:hidden}
+.u072-it.gone{grid-template-rows:0fr;margin-bottom:0}
+.u072-a{position:relative;display:flex;gap:12px;padding:14px 12px 14px 14px;border-radius:18px;background:color-mix(in srgb,var(--c) 10%,var(--ux-surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 22%,transparent);transition:transform .4s var(--ux-ease),opacity .3s}
+.u072-a::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--c)}
+.u072-it.gone .u072-a{transform:translateX(40px);opacity:0}
+.u072-ic{width:28px;height:28px;flex:none;border-radius:9px;display:grid;place-items:center;background:var(--c);color:var(--ux-accent-ink)}
+.u072-ic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.u072-tx{flex:1;min-width:0}
+.u072-tx b{display:block;font-size:14px;font-weight:780;letter-spacing:-.02em}
+.u072-tx p{margin:3px 0 0;font-size:12.5px;line-height:1.5;color:var(--ux-ink-2)}
+.u072-more{margin-top:8px;border:0;padding:0;background:none;display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:750;color:var(--c)}
+.u072-more svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;transition:transform .35s var(--ux-spring)}
+.u072-more[aria-expanded="true"] svg{transform:rotate(180deg)}
+.u072-log{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ux-ease)}
+.u072-log.on{grid-template-rows:1fr}
+.u072-log>div{min-height:0;overflow:hidden}
+.u072-log code{display:block;margin-top:8px;padding:10px;border-radius:10px;background:var(--ux-surface);font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ux-ink-2);white-space:pre;overflow-x:auto}
+.u072-prog{height:5px;margin-top:8px;border-radius:3px;background:color-mix(in srgb,var(--c) 18%,transparent);overflow:hidden}
+.u072-prog i{display:block;height:100%;width:72%;border-radius:inherit;background:var(--c)}
+.u072-x{width:28px;height:28px;flex:none;margin:-2px -2px 0 0;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:none;color:var(--ux-ink-3);transition:background-color .2s,color .2s,transform .3s var(--ux-spring)}
+.u072-x:hover{background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ux-ink)}
+.u072-x:active{transform:scale(.85)}
+.u072-x svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}
+.u072-x:focus-visible,.u072-more:focus-visible,.u072-again:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}
+.u072-calm{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;text-align:center;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .4s .3s,transform .5s var(--ux-spring) .3s}
+.u072.is-clear .u072-calm{opacity:1;transform:none;pointer-events:auto}
+.u072-calm i{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--ux-mint) 15%,transparent);color:var(--ux-mint)}
+.u072-calm i svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.u072-calm b{font-size:15px;font-weight:800}
+.u072-again{height:40px;padding:0 16px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:13px;font-weight:720;color:var(--ux-ink)}
+</style>
+<div class="ux u072">
+  <div class="u072-head"><b>시스템 상태</b><small class="u072-n" aria-live="polite"></small></div>
+  <ul class="u072-list">
+    <li class="u072-it"><div><div class="u072-a" role="alert" style="--c:var(--ux-danger)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 4.5v4M8 11.2h.01"/></svg></span><div class="u072-tx"><b>결제 웹훅이 실패했어요</b><p>최근 3번의 요청이 응답하지 않았어요.</p><button class="u072-more" type="button" aria-expanded="false">자세히 <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3"/></svg></button><div class="u072-log"><div><code>09:41:02  /hooks/pay  504
+09:41:32  /hooks/pay  504
+09:42:02  /hooks/pay  504</code></div></div></div><button class="u072-x" type="button" aria-label="결제 웹훅 알림 닫기"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+    <li class="u072-it"><div><div class="u072-a" role="status" style="--c:var(--ux-warn)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 2.5l6 10.5H2zM8 7v2.5M8 11.3h.01"/></svg></span><div class="u072-tx"><b>저장 공간 72% 사용 중</b><p>90%를 넘으면 새 업로드가 멈춰요.</p><div class="u072-prog" aria-hidden="true"><i></i></div></div><button class="u072-x" type="button" aria-label="저장 공간 알림 닫기"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+    <li class="u072-it"><div><div class="u072-a" role="status" style="--c:var(--ux-accent)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 7.5v4M8 4.8h.01"/></svg></span><div class="u072-tx"><b>새 버전 2.4가 나왔어요</b><p>다크 모드 대비가 좋아졌어요.</p></div><button class="u072-x" type="button" aria-label="새 버전 알림 닫기"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+    <li class="u072-it"><div><div class="u072-a" role="status" style="--c:var(--ux-mint)"><span class="u072-ic" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M4 8.4l2.6 2.6L12 5.5"/></svg></span><div class="u072-tx"><b>백업을 마쳤어요</b><p>오늘 오전 4:00 · 12.8GB</p></div><button class="u072-x" type="button" aria-label="백업 알림 닫기"><svg viewBox="0 0 13 13"><path d="M3 3l7 7M10 3l-7 7"/></svg></button></div></div></li>
+  </ul>
+  <div class="u072-calm" aria-hidden="true"><i><svg viewBox="0 0 26 26"><path d="M7 13.5l4 4L19 9"/></svg></i><b>확인할 알림이 없어요</b><button class="u072-again" type="button" tabindex="-1">알림 다시 보기</button></div>
+</div>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var its = Array.prototype.slice.call(root.querySelectorAll('.u072-it')), n = root.querySelector('.u072-n');
+  var calm = root.querySelector('.u072-calm'), again = root.querySelector('.u072-again'), more = root.querySelector('.u072-more'), log = root.querySelector('.u072-log');
+  function count() {
+    var k = its.filter(function (it) { return !it.classList.contains('gone'); }).length;
+    n.textContent = k ? '알림 ' + k + '개' : '';
+    root.classList.toggle('is-clear', !k);
+    calm.setAttribute('aria-hidden', String(!!k));
+    again.tabIndex = k ? -1 : 0;
+    return k;
+  }
+  // 닫으면 먼저 옆으로 밀려나고, 이어서 높이가 접히며 아래 줄이 올라옵니다
+  its.forEach(function (it, i) {
+    it.querySelector('.u072-x').addEventListener('click', function () {
+      it.classList.add('gone'); it.inert = true;
+      var rest = its.filter(function (x) { return !x.classList.contains('gone'); });
+      var next = rest.filter(function (x) { return its.indexOf(x) > i; })[0] || rest[rest.length - 1];
+      if (count() && next) next.querySelector('.u072-x').focus({ preventScroll: true });
+      else setTimeout(function () { if (root.isConnected) again.focus({ preventScroll: true }); }, 500);
+    });
+  });
+  more.addEventListener('click', function () {
+    var on = more.getAttribute('aria-expanded') !== 'true';
+    more.setAttribute('aria-expanded', String(on));
+    more.firstChild.textContent = on ? '접기 ' : '자세히 ';
+    log.classList.toggle('on', on);
+  });
+  again.addEventListener('click', function () {
+    its.forEach(function (it, i) { setTimeout(function () { if (!root.isConnected) return; it.classList.remove('gone'); it.inert = false; if (i === its.length - 1) count(); }, i * 90); });
+    root.classList.remove('is-clear');
+    setTimeout(function () { if (root.isConnected) its[0].querySelector('.u072-x').focus({ preventScroll: true }); }, 200);
+  });
+  count();
+})();
+</script>
+</div></div></figure></div></article>
+</section>
+
+<section class="part" aria-labelledby="d3">
+  <h2 id="d3">글자 명암비 점검</h2>
+  <p class="intro">바뀌는 토큰이 세 요소 안에서 글자색으로 쓰이는 곳의 명암비입니다. 기준은 디자인 원칙 3의 4.5:1입니다.</p>
+  <div class="tbl"><table>
+    <thead><tr><th scope="col">위치</th><th scope="col">원본</th><th scope="col">보정판</th></tr></thead>
+    <tbody><tr><th scope="row">작은 설명 글자(카드 위)</th><td class="n">3.37<span class="miss">기준 미달</span></td><td class="n">5.09</td></tr><tr><th scope="row">023 ‘2개 켜짐’ 배지</th><td class="n">4.20<span class="miss">기준 미달</span></td><td class="n">4.52</td></tr><tr><th scope="row">023 ‘모두 끄기’에 올렸을 때</th><td class="n">3.54<span class="miss">기준 미달</span></td><td class="n">4.54</td></tr><tr><th scope="row">042 현재 단계 번호</th><td class="n">4.93</td><td class="n">5.30</td></tr><tr><th scope="row">042 ‘시작하기’ 단추 글자</th><td class="n">3.49<span class="miss">기준 미달</span></td><td class="n">5.05</td></tr><tr><th scope="row">072 ‘자세히’ 글자</th><td class="n">3.90<span class="miss">기준 미달</span></td><td class="n">5.00</td></tr></tbody>
+  </table></div>
+</section>
+
+<section class="part" aria-labelledby="d4">
+  <h2 id="d4">이번 보정으로 다루지 않은 것</h2>
+  <ul class="limits">
+    <li><b>다크 화면</b>원본의 다크 값도 작은 설명 글자(<code>--ux-ink-3</code>)가 3.56~3.72:1로 4.5:1에 못 미칩니다. 이번에는 라이트 값만 보정했습니다.</li>
+    <li><b>요소에 직접 적은 색</b>원본 요소 400개 가운데 242개는 흰색과 검은색이 아닌 색을 요소 코드에 직접 적어 두었습니다. 그런 색은 토큰 보정으로 바뀌지 않으므로, 요소를 들일 때 하나씩 확인해야 합니다.</li>
+    <li><b>그림이나 아이콘의 명암비</b>스위치, 아이콘, 진행 막대처럼 글자가 아닌 표시는 이번 점검에 넣지 않았습니다.</li>
+  </ul>
+</section>
+
+<footer class="foot">
+  <p>요소 출처: Lucian UX/UI Prompt(MIT 라이선스, © 2026 Seokwoooo)의 <a href="https://lucianlabs.dev/uxui-prompt/#023">023</a>, <a href="https://lucianlabs.dev/uxui-prompt/#042">042</a>, <a href="https://lucianlabs.dev/uxui-prompt/#072">072</a>. 이 화면은 원작자와 관계없는 사본이며, 요소 코드 맨 위의 라이선스 주석을 그대로 남겨 두었습니다.</p>
+</footer>
+</div>
+<script type="application/json" id="lcan-src">{"023": {"html": "<!-- Lucian UX/UI Prompt #023 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#023 -->\n<!--\nElement: 펼쳐지는 알림 설정\nID: 023 · Category: 토글·선택 · Tags: settings, switch, list, expand, disclosure\nWhat it does: 스위치를 켜면 그 아래로 세부 옵션이 높이를 늘리며 펼쳐집니다. ‘모두 끄기’를 누르면 위에서부터 차례로 꺼지고, 꺼진 항목의 아이콘은 회색으로 가라앉습니다.\nHow to use it: 이메일 요약을 켜서 주기를 골라 보고, 아래의 모두 끄기도 눌러 보세요\nFootprint: fixed size, square\nNeeds: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.\nLive demo: https://lucianlabs.dev/uxui-prompt/#023\n-->\n<style>\n.u023{position:relative;display:flex;flex-direction:column;width:340px;height:420px;padding:22px 20px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}\n.u023-top{display:flex;align-items:center;justify-content:space-between;padding:0 4px 10px}\n.u023-top b{font-size:20px;font-weight:760;letter-spacing:-.035em}\n.u023-badge{font-size:12.5px;font-weight:700;padding:5px 10px;border-radius:999px;background:var(--ux-accent-soft);color:var(--ux-accent);font-variant-numeric:tabular-nums;transition:background-color .3s,color .3s}\n.u023-item{border-top:1px solid var(--ux-line)}\n.u023-head{display:flex;align-items:center;gap:14px;padding:14px 4px}\n.u023-ic{width:40px;height:40px;flex:none;border-radius:12px;display:grid;place-items:center;color:#fff;background:var(--g);transition:filter .5s var(--ux-ease),opacity .5s var(--ux-ease)}\n.u023-ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}\n.u023-item.is-off .u023-ic{filter:grayscale(1);opacity:.45}\n.u023-t{flex:1;min-width:0}\n.u023-t b{display:block;font-size:15.5px;font-weight:680;letter-spacing:-.02em}\n.u023-t small{display:block;margin-top:2px;font-size:13px;color:var(--ux-ink-3)}\n.u023-sw{position:relative;width:52px;height:32px;flex:none;border:0;padding:0;border-radius:999px;background:var(--ux-surface-3);transition:background-color .4s var(--ux-ease)}\n.u023-sw::after{content:\"\";position:absolute;left:3px;top:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px -1px rgba(0,0,0,.3);transition:transform .5s var(--ux-spring),width .25s var(--ux-ease)}\n.u023-sw:active::after{width:32px}\n.u023-sw[aria-checked=\"true\"]{background:var(--ux-mint)}\n.u023-sw[aria-checked=\"true\"]::after{transform:translateX(20px)}\n.u023-sw[aria-checked=\"true\"]:active::after{transform:translateX(14px)}\n.u023-sw:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}\n.u023-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ux-ease)}\n.u023-more.is-open{grid-template-rows:1fr}\n.u023-more>div{overflow:hidden;min-height:0}\n.u023-opts{position:relative;display:flex;margin:0 4px 16px 58px;padding:4px;border-radius:12px;background:var(--ux-surface-2);opacity:0;transform:translateY(-8px);transition:opacity .3s var(--ux-ease),transform .5s var(--ux-spring)}\n.u023-more.is-open .u023-opts{opacity:1;transform:none;transition-delay:.12s}\n.u023-pill{position:absolute;left:4px;top:4px;bottom:4px;width:calc((100% - 8px) / 3);border-radius:9px;background:var(--ux-surface);box-shadow:0 1px 0 var(--ux-line),0 4px 10px -6px var(--ux-shadow-strong);transform:translateX(calc(var(--i,1) * 100%));transition:transform .5s var(--ux-spring)}\n.u023-opt{position:relative;flex:1;height:34px;border:0;background:none;border-radius:9px;font-size:13.5px;font-weight:650;color:var(--ux-ink-3);transition:color .3s var(--ux-ease)}\n.u023-opt[aria-checked=\"true\"]{color:var(--ux-ink)}\n.u023-opt:focus-visible{outline:2px solid var(--ux-accent);outline-offset:1px}\n.u023-all{margin-top:auto;height:48px;border:0;border-radius:15px;background:var(--ux-surface-2);font-size:14.5px;font-weight:680;color:var(--ux-ink-2);transition:background-color .3s var(--ux-ease),color .3s var(--ux-ease),transform .4s var(--ux-spring)}\n.u023-all:hover{color:var(--ux-danger);background:color-mix(in srgb,var(--ux-danger) 10%,var(--ux-surface-2))}\n.u023-all:active{transform:scale(.98)}\n.u023-all:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}\n<\/style>\n<div class=\"ux u023\">\n  <div class=\"u023-top\"><b>알림 설정<\/b><span class=\"u023-badge\" aria-live=\"polite\">2개 켜짐<\/span><\/div>\n  <div class=\"u023-item\">\n    <div class=\"u023-head\">\n      <span class=\"u023-ic\" style=\"--g:linear-gradient(140deg,#FF8A65,#FF5A6E)\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\"><path d=\"M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15zM10 20.5a2.2 2.2 0 0 0 4 0\"/><\/svg><\/span>\n      <div class=\"u023-t\"><b>푸시 알림<\/b><small>멘션과 답글만 알려요<\/small><\/div>\n      <button class=\"u023-sw\" type=\"button\" role=\"switch\" aria-checked=\"true\" aria-label=\"푸시 알림\"><\/button>\n    <\/div>\n  <\/div>\n  <div class=\"u023-item\">\n    <div class=\"u023-head\">\n      <span class=\"u023-ic\" style=\"--g:linear-gradient(140deg,#5B8CFF,#3D6BFF)\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\"><rect x=\"3.5\" y=\"5.5\" width=\"17\" height=\"13\" rx=\"2.5\"/><path d=\"M4 7l8 6 8-6\"/><\/svg><\/span>\n      <div class=\"u023-t\"><b>이메일 요약<\/b><small class=\"u023-mail\">꺼져 있어요<\/small><\/div>\n      <button class=\"u023-sw\" type=\"button\" role=\"switch\" aria-checked=\"false\" aria-label=\"이메일 요약\" data-more><\/button>\n    <\/div>\n    <div class=\"u023-more\">\n      <div>\n        <div class=\"u023-opts\" role=\"radiogroup\" aria-label=\"요약 주기\">\n          <span class=\"u023-pill\" aria-hidden=\"true\"><\/span>\n          <button class=\"u023-opt\" type=\"button\" role=\"radio\" aria-checked=\"false\">매일<\/button>\n          <button class=\"u023-opt\" type=\"button\" role=\"radio\" aria-checked=\"true\">매주<\/button>\n          <button class=\"u023-opt\" type=\"button\" role=\"radio\" aria-checked=\"false\">매월<\/button>\n        <\/div>\n      <\/div>\n    <\/div>\n  <\/div>\n  <div class=\"u023-item\">\n    <div class=\"u023-head\">\n      <span class=\"u023-ic\" style=\"--g:linear-gradient(140deg,#22C3A6,#119C72)\" aria-hidden=\"true\"><svg viewBox=\"0 0 24 24\"><path d=\"M5 4.5h11l3 3V19a.5.5 0 0 1-.5.5h-13A.5.5 0 0 1 5 19z\"/><path d=\"M8 4.5V9h7V4.5M8 19.5v-5h8v5\"/><\/svg><\/span>\n      <div class=\"u023-t\"><b>자동 저장<\/b><small>30초마다 저장해요<\/small><\/div>\n      <button class=\"u023-sw\" type=\"button\" role=\"switch\" aria-checked=\"true\" aria-label=\"자동 저장\"><\/button>\n    <\/div>\n  <\/div>\n  <button class=\"u023-all\" type=\"button\">모두 끄기<\/button>\n<\/div>\n", "js": "\n(function () {\n  var root = document.currentScript.previousElementSibling;\n  var sws = Array.prototype.slice.call(root.querySelectorAll('.u023-sw'));\n  var more = root.querySelector('.u023-more');\n  var mail = root.querySelector('.u023-mail');\n  var opts = Array.prototype.slice.call(root.querySelectorAll('.u023-opt'));\n  var pill = root.querySelector('.u023-pill');\n  var badge = root.querySelector('.u023-badge');\n  var all = root.querySelector('.u023-all');\n  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;\n  var freq = 1;\n  function setSw(sw, on) {\n    sw.setAttribute('aria-checked', String(on));\n    sw.closest('.u023-item').classList.toggle('is-off', !on);\n    if (sw.hasAttribute('data-more')) {\n      more.classList.toggle('is-open', on);\n      mail.textContent = on ? opts[freq].textContent + ' 아침 8시에 보내요' : '꺼져 있어요';\n      opts.forEach(function (o) { o.tabIndex = on && o.getAttribute('aria-checked') === 'true' ? 0 : -1; });\n    }\n    var n = sws.filter(function (s) { return s.getAttribute('aria-checked') === 'true'; }).length;\n    badge.textContent = n ? n + '개 켜짐' : '모두 꺼짐';\n  }\n  sws.forEach(function (sw) {\n    setSw(sw, sw.getAttribute('aria-checked') === 'true');\n    sw.addEventListener('click', function () { setSw(sw, sw.getAttribute('aria-checked') !== 'true'); });\n  });\n  function pick(i, focus) {\n    freq = i;\n    opts.forEach(function (o, k) { o.setAttribute('aria-checked', String(k === i)); o.tabIndex = k === i ? 0 : -1; });\n    pill.style.setProperty('--i', i);\n    mail.textContent = opts[i].textContent + ' 아침 8시에 보내요';\n    if (focus) opts[i].focus();\n  }\n  opts.forEach(function (o, i) {\n    o.addEventListener('click', function () { pick(i); });\n    o.addEventListener('keydown', function (e) {\n      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;\n      if (d) { e.preventDefault(); pick((i + d + 3) % 3, true); }\n    });\n  });\n  // 모두 끄기: 위에서부터 0.12초 간격으로 차례차례 끕니다\n  all.addEventListener('click', function () {\n    sws.forEach(function (sw, i) {\n      setTimeout(function () { if (root.isConnected) setSw(sw, false); }, rm ? 0 : i * 120);\n    });\n  });\n})();\n", "steps": [["wait", 500], ["tap", ".u023-sw", 1], ["wait", 1100], ["tap", ".u023-opt", 0], ["wait", 900], ["tap", ".u023-opt", 2], ["wait", 1000], ["tap", ".u023-all"], ["wait", 1900], ["reset"]]}, "042": {"html": "<!-- Lucian UX/UI Prompt #042 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#042 -->\n<!--\nElement: 단계 진행 마법사\nID: 042 · Category: 메뉴·탭 · Tags: stepper, wizard, onboarding, progress, steps\nWhat it does: 다음을 누르면 진행선이 다음 동그라미까지 차오르고, 지난 단계는 체크로 바뀝니다. 본문은 진행 방향으로 밀려 바뀌며, 마지막 단계에서는 버튼이 ‘시작하기’로 바뀝니다.\nHow to use it: 다음과 이전을 눌러 단계를 오가 보세요. 위쪽의 지난 단계 동그라미를 눌러도 돌아갑니다\nFootprint: fixed size, square\nNeeds: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.\nLive demo: https://lucianlabs.dev/uxui-prompt/#042\n-->\n<style>\n.u042{position:relative;width:350px;height:400px;display:flex;flex-direction:column;padding:22px 20px 18px;border-radius:28px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong)}\n.u042-steps{position:relative;display:flex;justify-content:space-between;margin:0 6px;padding:0;list-style:none}\n.u042-line{position:absolute;left:17px;right:17px;top:16px;height:3px;border-radius:2px;background:var(--ux-surface-3)}\n.u042-line i{position:absolute;inset:0;border-radius:inherit;background:var(--ux-grad);transform-origin:0 50%;transform:scaleX(var(--p,0));transition:transform .6s var(--ux-ease)}\n.u042-st{position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;width:34px}\n.u042-dot{position:relative;width:34px;height:34px;border:0;padding:0;border-radius:50%;background:var(--ux-surface);box-shadow:inset 0 0 0 2px var(--ux-line-2);font-size:13.5px;font-weight:780;color:var(--ux-ink-3);display:grid;place-items:center;transition:box-shadow .35s,background-color .35s,color .35s,transform .45s var(--ux-spring)}\n.u042-dot:focus-visible{outline:2px solid var(--ux-accent);outline-offset:3px}\n.u042-dot svg{position:absolute;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}\n.u042-dot path{stroke-dasharray:16;stroke-dashoffset:16;transition:stroke-dashoffset .35s var(--ux-ease) .1s}\n.u042-st.cur .u042-dot{box-shadow:inset 0 0 0 2px var(--ux-accent),0 0 0 5px var(--ux-accent-soft);color:var(--ux-accent);transform:scale(1.08)}\n.u042-st.done .u042-dot{background:var(--ux-accent);box-shadow:none;color:var(--ux-accent-ink);cursor:pointer}\n.u042-st.done .u042-dot span{opacity:0}\n.u042-st.done .u042-dot svg{opacity:1}\n.u042-st.done .u042-dot path{stroke-dashoffset:0}\n.u042-st small{font-size:11.5px;font-weight:700;color:var(--ux-ink-3);white-space:nowrap;transition:color .3s}\n.u042-st.cur small,.u042-st.done small{color:var(--ux-ink)}\n.u042-view{position:relative;flex:1;margin-top:22px;overflow:hidden}\n.u042-pane{position:absolute;inset:0;transition:transform .55s var(--ux-ease),opacity .35s var(--ux-ease)}\n.u042-pane h4{margin:0;font-size:19px;font-weight:780;letter-spacing:-.03em}\n.u042-pane p{margin:5px 0 16px;font-size:13.5px;color:var(--ux-ink-3)}\n.u042-fld{display:flex;align-items:center;gap:10px;height:50px;padding:0 14px;border-radius:14px;background:var(--ux-surface-2);font-size:15px;font-weight:620;margin-bottom:8px}\n.u042-url{color:var(--ux-ink-3);font-weight:560}\n.u042-url b{color:var(--ux-ink);font-weight:700}\n.u042-fld small{margin-left:auto;font-size:12px;color:var(--ux-ink-3)}\n.u042-chips{display:flex;gap:6px}\n.u042-chips span{padding:8px 12px;border-radius:999px;font-size:13px;font-weight:650;box-shadow:inset 0 0 0 1px var(--ux-line-2);color:var(--ux-ink-2)}\n.u042-chips span.on{background:var(--ux-ink);color:var(--ux-page);box-shadow:none}\n.u042-av{width:30px;height:30px;flex:none;border-radius:50%;background:var(--c)}\n.u042-done{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center}\n.u042-big{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;background:var(--ux-mint);color:var(--ux-accent-ink);box-shadow:0 0 0 10px color-mix(in srgb,var(--ux-mint) 18%,transparent);transform:scale(.5);transition:transform .6s var(--ux-spring) .2s}\n.u042-big svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}\n.u042-pane.on .u042-big{transform:none}\n.u042-done h4{margin-top:18px}\n.u042-foot{display:flex;gap:8px;margin-top:12px}\n.u042-b{height:50px;border:0;border-radius:15px;font-size:15px;font-weight:700;transition:transform .35s var(--ux-spring),opacity .3s,background-color .3s}\n.u042-b:active{transform:scale(.96)}\n.u042-b:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}\n.u042-prev{width:96px;background:var(--ux-surface-2);color:var(--ux-ink)}\n.u042-prev[aria-disabled=\"true\"]{opacity:.35}\n.u042-next{flex:1;background:var(--ux-ink);color:var(--ux-page)}\n.u042.is-last .u042-next{background:var(--ux-mint);color:var(--ux-accent-ink)}\n<\/style>\n<div class=\"ux u042\">\n  <ol class=\"u042-steps\" aria-label=\"가입 단계\">\n    <li class=\"u042-line\" aria-hidden=\"true\"><i><\/i><\/li>\n    <li class=\"u042-st\"><button class=\"u042-dot\" type=\"button\" tabindex=\"-1\"><span>1<\/span><svg viewBox=\"0 0 16 16\"><path d=\"M3.5 8.4l3 3 6-6.4\"/><\/svg><\/button><small>계정<\/small><\/li>\n    <li class=\"u042-st\"><button class=\"u042-dot\" type=\"button\" tabindex=\"-1\"><span>2<\/span><svg viewBox=\"0 0 16 16\"><path d=\"M3.5 8.4l3 3 6-6.4\"/><\/svg><\/button><small>작업 공간<\/small><\/li>\n    <li class=\"u042-st\"><button class=\"u042-dot\" type=\"button\" tabindex=\"-1\"><span>3<\/span><svg viewBox=\"0 0 16 16\"><path d=\"M3.5 8.4l3 3 6-6.4\"/><\/svg><\/button><small>초대<\/small><\/li>\n    <li class=\"u042-st\"><button class=\"u042-dot\" type=\"button\" tabindex=\"-1\"><span>4<\/span><svg viewBox=\"0 0 16 16\"><path d=\"M3.5 8.4l3 3 6-6.4\"/><\/svg><\/button><small>완료<\/small><\/li>\n  <\/ol>\n  <div class=\"u042-view\" aria-live=\"polite\">\n    <section class=\"u042-pane\"><h4>어떻게 불러 드릴까요?<\/h4><p>팀원에게 보이는 이름이에요<\/p><div class=\"u042-fld\">김서연<small>이름<\/small><\/div><div class=\"u042-chips\"><span class=\"on\">디자이너<\/span><span>개발자<\/span><span>기획자<\/span><\/div><\/section>\n    <section class=\"u042-pane\"><h4>작업 공간을 만들어요<\/h4><p>나중에 언제든 바꿀 수 있어요<\/p><div class=\"u042-fld\">Lumen 디자인<small>이름<\/small><\/div><div class=\"u042-fld\"><span class=\"u042-url\">lumen.app/<b>design<\/b><\/span><small>주소<\/small><\/div><\/section>\n    <section class=\"u042-pane\"><h4>함께할 사람을 초대해요<\/h4><p>초대 메일은 바로 발송돼요<\/p><div class=\"u042-fld\"><span class=\"u042-av\" style=\"--c:linear-gradient(140deg,#FFB547,#FF7A45)\"><\/span>jun@example.com<small>편집자<\/small><\/div><div class=\"u042-fld\"><span class=\"u042-av\" style=\"--c:linear-gradient(140deg,#22C3A6,#0EA5E9)\"><\/span>mina@example.com<small>보기<\/small><\/div><\/section>\n    <section class=\"u042-pane\"><div class=\"u042-done\"><span class=\"u042-big\"><svg viewBox=\"0 0 34 34\"><path d=\"M9 17.5l5.5 5.5L25.5 12\"/><\/svg><\/span><h4>준비가 끝났어요<\/h4><p>Lumen 디자인에 오신 걸 환영해요<\/p><\/div><\/section>\n  <\/div>\n  <div class=\"u042-foot\"><button class=\"u042-b u042-prev\" type=\"button\">이전<\/button><button class=\"u042-b u042-next\" type=\"button\">다음<\/button><\/div>\n<\/div>\n", "js": "\n(function () {\n  var root = document.currentScript.previousElementSibling;\n  var sts = Array.prototype.slice.call(root.querySelectorAll('.u042-st'));\n  var panes = Array.prototype.slice.call(root.querySelectorAll('.u042-pane'));\n  var line = root.querySelector('.u042-line i');\n  var prev = root.querySelector('.u042-prev'), next = root.querySelector('.u042-next');\n  var cur = -1;\n  // 본문은 나아가는 방향으로 밀려 바뀌고, 진행선은 현재 단계까지 차오릅니다\n  function go(i) {\n    if (i < 0 || i > 3 || i === cur) return;\n    var dir = i > cur ? 1 : -1;\n    panes.forEach(function (p, k) {\n      p.classList.toggle('on', k === i);\n      p.setAttribute('aria-hidden', String(k !== i));\n      p.style.opacity = k === i ? '1' : '0';\n      p.style.transform = k === i ? 'none' : 'translateX(' + (k < i ? -40 : 40) + '%)';\n      if (k === i && cur >= 0) {\n        p.style.transition = 'none';\n        p.style.transform = 'translateX(' + (dir * 40) + '%)'; p.style.opacity = '0';\n        void p.offsetWidth;\n        p.style.transition = '';\n        p.style.transform = 'none'; p.style.opacity = '1';\n      }\n    });\n    cur = i;\n    sts.forEach(function (s, k) {\n      s.classList.toggle('done', k < i);\n      s.classList.toggle('cur', k === i);\n      var d = s.querySelector('.u042-dot');\n      d.tabIndex = k < i ? 0 : -1;\n      d.setAttribute('aria-label', (k + 1) + '단계 ' + s.querySelector('small').textContent + (k < i ? ', 완료. 눌러서 돌아가기' : k === i ? ', 현재 단계' : ''));\n      if (k === i) d.setAttribute('aria-current', 'step'); else d.removeAttribute('aria-current');\n    });\n    line.parentNode.style.setProperty('--p', (i / 3).toFixed(3));\n    prev.setAttribute('aria-disabled', String(i === 0));\n    root.classList.toggle('is-last', i === 3);\n    next.textContent = i === 3 ? '시작하기' : '다음';\n  }\n  next.addEventListener('click', function () {\n    if (cur === 3) { next.textContent = '환영해요!'; setTimeout(function () { if (root.isConnected) go(0); }, 900); return; }\n    go(cur + 1);\n  });\n  prev.addEventListener('click', function () { go(cur - 1); });\n  sts.forEach(function (s, k) { s.querySelector('.u042-dot').addEventListener('click', function () { if (k < cur) go(k); }); });\n  go(0);\n})();\n", "steps": [["wait", 700], ["tap", ".u042-next"], ["wait", 1200], ["tap", ".u042-next"], ["wait", 1200], ["tap", ".u042-next"], ["wait", 1300], ["tap", ".u042-prev"], ["wait", 1000], ["tap", ".u042-next"], ["wait", 1100], ["tap", ".u042-next"], ["wait", 1800]]}, "072": {"html": "<!-- Lucian UX/UI Prompt #072 · MIT License (c) 2026 Seokwoooo · https://lucianlabs.dev/uxui-prompt/#072 -->\n<!--\nElement: 접히는 인라인 알림\nID: 072 · Category: 알림·피드백 · Tags: alert, inline, dismiss, collapse, status\nWhat it does: 종류마다 색과 아이콘이 다른 알림 줄이 쌓여 있습니다. 닫으면 옆으로 밀려나며 높이가 접히고 아래 줄이 올라와 자리를 채웁니다. 오류 알림은 ‘자세히’를 눌러 기록을 펼칠 수 있고, 모두 닫으면 다시 불러오기 버튼이 나타납니다.\nHow to use it: 각 알림의 ×를 눌러 닫아 보고, 오류 알림의 ‘자세히’로 기록을 펼쳐 보세요. 모두 닫은 뒤 ‘알림 다시 보기’로 되돌릴 수 있습니다\nFootprint: fixed size, tall\nNeeds: tokens.css (the --ux-* theme tokens and the .ux base). Map the tokens to the project's theme variables.\nLive demo: https://lucianlabs.dev/uxui-prompt/#072\n-->\n<style>\n.u072{position:relative;width:340px;height:470px;display:flex;flex-direction:column;padding:20px 16px 16px;border-radius:30px;background:var(--ux-surface);box-shadow:0 0 0 1px var(--ux-line),0 30px 60px -36px var(--ux-shadow-strong);overflow:hidden}\n.u072-head{display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 12px}\n.u072-head b{font-size:20px;font-weight:850;letter-spacing:-.045em}\n.u072-head small{font-size:12.5px;font-weight:700;color:var(--ux-ink-3)}\n.u072-list{margin:0;padding:0;list-style:none}\n.u072-it{display:grid;grid-template-rows:1fr;transition:grid-template-rows .45s var(--ux-ease) .12s,margin .45s var(--ux-ease) .12s;margin-bottom:8px}\n.u072-it>div{min-height:0;overflow:hidden}\n.u072-it.gone{grid-template-rows:0fr;margin-bottom:0}\n.u072-a{position:relative;display:flex;gap:12px;padding:14px 12px 14px 14px;border-radius:18px;background:color-mix(in srgb,var(--c) 10%,var(--ux-surface));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 22%,transparent);transition:transform .4s var(--ux-ease),opacity .3s}\n.u072-a::before{content:\"\";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--c)}\n.u072-it.gone .u072-a{transform:translateX(40px);opacity:0}\n.u072-ic{width:28px;height:28px;flex:none;border-radius:9px;display:grid;place-items:center;background:var(--c);color:var(--ux-accent-ink)}\n.u072-ic svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}\n.u072-tx{flex:1;min-width:0}\n.u072-tx b{display:block;font-size:14px;font-weight:780;letter-spacing:-.02em}\n.u072-tx p{margin:3px 0 0;font-size:12.5px;line-height:1.5;color:var(--ux-ink-2)}\n.u072-more{margin-top:8px;border:0;padding:0;background:none;display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:750;color:var(--c)}\n.u072-more svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;transition:transform .35s var(--ux-spring)}\n.u072-more[aria-expanded=\"true\"] svg{transform:rotate(180deg)}\n.u072-log{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s var(--ux-ease)}\n.u072-log.on{grid-template-rows:1fr}\n.u072-log>div{min-height:0;overflow:hidden}\n.u072-log code{display:block;margin-top:8px;padding:10px;border-radius:10px;background:var(--ux-surface);font:600 11.5px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ux-ink-2);white-space:pre;overflow-x:auto}\n.u072-prog{height:5px;margin-top:8px;border-radius:3px;background:color-mix(in srgb,var(--c) 18%,transparent);overflow:hidden}\n.u072-prog i{display:block;height:100%;width:72%;border-radius:inherit;background:var(--c)}\n.u072-x{width:28px;height:28px;flex:none;margin:-2px -2px 0 0;border:0;padding:0;border-radius:50%;display:grid;place-items:center;background:none;color:var(--ux-ink-3);transition:background-color .2s,color .2s,transform .3s var(--ux-spring)}\n.u072-x:hover{background:color-mix(in srgb,var(--c) 14%,transparent);color:var(--ux-ink)}\n.u072-x:active{transform:scale(.85)}\n.u072-x svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round}\n.u072-x:focus-visible,.u072-more:focus-visible,.u072-again:focus-visible{outline:2px solid var(--ux-accent);outline-offset:2px}\n.u072-calm{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;text-align:center;opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity .4s .3s,transform .5s var(--ux-spring) .3s}\n.u072.is-clear .u072-calm{opacity:1;transform:none;pointer-events:auto}\n.u072-calm i{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--ux-mint) 15%,transparent);color:var(--ux-mint)}\n.u072-calm i svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}\n.u072-calm b{font-size:15px;font-weight:800}\n.u072-again{height:40px;padding:0 16px;border:0;border-radius:999px;background:var(--ux-surface-2);font-size:13px;font-weight:720;color:var(--ux-ink)}\n<\/style>\n<div class=\"ux u072\">\n  <div class=\"u072-head\"><b>시스템 상태<\/b><small class=\"u072-n\" aria-live=\"polite\"><\/small><\/div>\n  <ul class=\"u072-list\">\n    <li class=\"u072-it\"><div><div class=\"u072-a\" role=\"alert\" style=\"--c:var(--ux-danger)\"><span class=\"u072-ic\" aria-hidden=\"true\"><svg viewBox=\"0 0 16 16\"><path d=\"M8 4.5v4M8 11.2h.01\"/><\/svg><\/span><div class=\"u072-tx\"><b>결제 웹훅이 실패했어요<\/b><p>최근 3번의 요청이 응답하지 않았어요.<\/p><button class=\"u072-more\" type=\"button\" aria-expanded=\"false\">자세히 <svg viewBox=\"0 0 12 12\" aria-hidden=\"true\"><path d=\"M3 4.5l3 3 3-3\"/><\/svg><\/button><div class=\"u072-log\"><div><code>09:41:02  /hooks/pay  504\n09:41:32  /hooks/pay  504\n09:42:02  /hooks/pay  504<\/code><\/div><\/div><\/div><button class=\"u072-x\" type=\"button\" aria-label=\"결제 웹훅 알림 닫기\"><svg viewBox=\"0 0 13 13\"><path d=\"M3 3l7 7M10 3l-7 7\"/><\/svg><\/button><\/div><\/div><\/li>\n    <li class=\"u072-it\"><div><div class=\"u072-a\" role=\"status\" style=\"--c:var(--ux-warn)\"><span class=\"u072-ic\" aria-hidden=\"true\"><svg viewBox=\"0 0 16 16\"><path d=\"M8 2.5l6 10.5H2zM8 7v2.5M8 11.3h.01\"/><\/svg><\/span><div class=\"u072-tx\"><b>저장 공간 72% 사용 중<\/b><p>90%를 넘으면 새 업로드가 멈춰요.<\/p><div class=\"u072-prog\" aria-hidden=\"true\"><i><\/i><\/div><\/div><button class=\"u072-x\" type=\"button\" aria-label=\"저장 공간 알림 닫기\"><svg viewBox=\"0 0 13 13\"><path d=\"M3 3l7 7M10 3l-7 7\"/><\/svg><\/button><\/div><\/div><\/li>\n    <li class=\"u072-it\"><div><div class=\"u072-a\" role=\"status\" style=\"--c:var(--ux-accent)\"><span class=\"u072-ic\" aria-hidden=\"true\"><svg viewBox=\"0 0 16 16\"><path d=\"M8 7.5v4M8 4.8h.01\"/><\/svg><\/span><div class=\"u072-tx\"><b>새 버전 2.4가 나왔어요<\/b><p>다크 모드 대비가 좋아졌어요.<\/p><\/div><button class=\"u072-x\" type=\"button\" aria-label=\"새 버전 알림 닫기\"><svg viewBox=\"0 0 13 13\"><path d=\"M3 3l7 7M10 3l-7 7\"/><\/svg><\/button><\/div><\/div><\/li>\n    <li class=\"u072-it\"><div><div class=\"u072-a\" role=\"status\" style=\"--c:var(--ux-mint)\"><span class=\"u072-ic\" aria-hidden=\"true\"><svg viewBox=\"0 0 16 16\"><path d=\"M4 8.4l2.6 2.6L12 5.5\"/><\/svg><\/span><div class=\"u072-tx\"><b>백업을 마쳤어요<\/b><p>오늘 오전 4:00 · 12.8GB<\/p><\/div><button class=\"u072-x\" type=\"button\" aria-label=\"백업 알림 닫기\"><svg viewBox=\"0 0 13 13\"><path d=\"M3 3l7 7M10 3l-7 7\"/><\/svg><\/button><\/div><\/div><\/li>\n  <\/ul>\n  <div class=\"u072-calm\" aria-hidden=\"true\"><i><svg viewBox=\"0 0 26 26\"><path d=\"M7 13.5l4 4L19 9\"/><\/svg><\/i><b>확인할 알림이 없어요<\/b><button class=\"u072-again\" type=\"button\" tabindex=\"-1\">알림 다시 보기<\/button><\/div>\n<\/div>\n", "js": "\n(function () {\n  var root = document.currentScript.previousElementSibling;\n  var its = Array.prototype.slice.call(root.querySelectorAll('.u072-it')), n = root.querySelector('.u072-n');\n  var calm = root.querySelector('.u072-calm'), again = root.querySelector('.u072-again'), more = root.querySelector('.u072-more'), log = root.querySelector('.u072-log');\n  function count() {\n    var k = its.filter(function (it) { return !it.classList.contains('gone'); }).length;\n    n.textContent = k ? '알림 ' + k + '개' : '';\n    root.classList.toggle('is-clear', !k);\n    calm.setAttribute('aria-hidden', String(!!k));\n    again.tabIndex = k ? -1 : 0;\n    return k;\n  }\n  // 닫으면 먼저 옆으로 밀려나고, 이어서 높이가 접히며 아래 줄이 올라옵니다\n  its.forEach(function (it, i) {\n    it.querySelector('.u072-x').addEventListener('click', function () {\n      it.classList.add('gone'); it.inert = true;\n      var rest = its.filter(function (x) { return !x.classList.contains('gone'); });\n      var next = rest.filter(function (x) { return its.indexOf(x) > i; })[0] || rest[rest.length - 1];\n      if (count() && next) next.querySelector('.u072-x').focus({ preventScroll: true });\n      else setTimeout(function () { if (root.isConnected) again.focus({ preventScroll: true }); }, 500);\n    });\n  });\n  more.addEventListener('click', function () {\n    var on = more.getAttribute('aria-expanded') !== 'true';\n    more.setAttribute('aria-expanded', String(on));\n    more.firstChild.textContent = on ? '접기 ' : '자세히 ';\n    log.classList.toggle('on', on);\n  });\n  again.addEventListener('click', function () {\n    its.forEach(function (it, i) { setTimeout(function () { if (!root.isConnected) return; it.classList.remove('gone'); it.inert = false; if (i === its.length - 1) count(); }, i * 90); });\n    root.classList.remove('is-clear');\n    setTimeout(function () { if (root.isConnected) its[0].querySelector('.u072-x').focus({ preventScroll: true }); }, 200);\n  });\n  count();\n})();\n", "steps": [["wait", 800], ["tap", ".u072-more"], ["wait", 1500], ["tap", ".u072-more"], ["wait", 700], ["tap", ".u072-x", 1], ["wait", 900], ["tap", ".u072-x", 0], ["wait", 800], ["tap", ".u072-x", 2], ["wait", 800], ["tap", ".u072-x", 3], ["wait", 1500], ["tap", ".u072-again"], ["wait", 1600]]}}</script>
+<script>
+(function () {
+  var SRC = JSON.parse(document.getElementById('lcan-src').textContent);
+  var PAD = 20;
+  function fit(stage) {
+    var f = stage.querySelector('.fit');
+    if (!f) return;
+    var w = f.offsetWidth, h = f.offsetHeight;
+    if (!w || !h) return;
+    var k = Math.max(0.3, Math.min(1, (stage.clientWidth - PAD * 2) / w));
+    f.style.transform = 'translate(-50%,-50%) scale(' + k.toFixed(4) + ')';
+    stage.style.height = Math.ceil(h * k + PAD * 2 + 12) + 'px';
+  }
+  var stages = Array.prototype.slice.call(document.querySelectorAll('.stage'));
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(function (entries) { entries.forEach(function (en) { fit(en.target); }); });
+    stages.forEach(function (s) { ro.observe(s); });
+  } else {
+    window.addEventListener('resize', function () { stages.forEach(fit); });
+  }
+  stages.forEach(fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { stages.forEach(fit); });
+
+  // A fresh copy of the element, mounted the way the upstream gallery mounts one
+  function mount(stage) {
+    var src = SRC[stage.getAttribute('data-el')], f = stage.querySelector('.fit');
+    stage._run = (stage._run || 0) + 1;
+    f.innerHTML = src.html;
+    var s = document.createElement('script');
+    s.textContent = src.js;
+    f.appendChild(s);
+    fit(stage);
+  }
+  function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+  // The upstream demo steps (taps and waits), run on one cell; a newer mount or run stops an older one
+  function play(stage) {
+    var steps = SRC[stage.getAttribute('data-el')].steps, i = 0;
+    mount(stage);
+    var token = stage._run;
+    function next() {
+      if (stage._run !== token || i >= steps.length) return Promise.resolve();
+      var st = steps[i++], root = stage.querySelector('.ux');
+      if (st[0] === 'wait') return wait(st[1]).then(next);
+      if (st[0] === 'tap') { var el = root && root.querySelectorAll(st[1])[st[2] || 0]; if (el) el.click(); return next(); }
+      if (st[0] === 'reset') { mount(stage); return Promise.resolve(); }
+      return next();
+    }
+    return next();
+  }
+  function stagesOf(btn) { return Array.prototype.slice.call(btn.closest('.row').querySelectorAll('.stage')); }
+  document.querySelectorAll('[data-play]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      Promise.all(stagesOf(btn).map(play)).then(function () { btn.disabled = false; });
+    });
+  });
+  document.querySelectorAll('[data-reset]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      stagesOf(btn).forEach(mount);
+      var play = btn.parentNode.querySelector('[data-play]');
+      if (play) play.disabled = false;
+    });
+  });
+
+  // Alternate the fixed cells between the fixed and the upstream values, so small changes are easy to see
+  var flipBtn = document.getElementById('flip'), flipState = document.getElementById('flip-state'), timer = null;
+  var cells = Array.prototype.slice.call(document.querySelectorAll('.cell.flip'));
+  function show(orig) {
+    cells.forEach(function (c) { c.classList.toggle('t-orig', orig); c.classList.toggle('t-fix', !orig); c.classList.toggle('is-flipped', orig); });
+    flipState.textContent = timer ? (orig ? '오른쪽 칸: 지금은 원본 값입니다.' : '오른쪽 칸: 지금은 보정판 값입니다.') : '';
+  }
+  if (flipBtn) flipBtn.addEventListener('click', function () {
+    var on = flipBtn.getAttribute('aria-pressed') !== 'true';
+    flipBtn.setAttribute('aria-pressed', String(on));
+    clearInterval(timer); timer = null;
+    if (on) { var orig = false; timer = setInterval(function () { orig = !orig; show(orig); }, 1200); show(false); }
+    else show(false);
+  });
+})();
+</script>

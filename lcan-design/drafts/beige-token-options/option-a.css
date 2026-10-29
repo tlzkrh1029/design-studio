@@ -1,0 +1,10 @@
+/* Option A: ink accent, flat. The baseline: closest to the beige drafts.
+   Strong marks are ink (the drafts' primary button and 'triggered' badge), and there are no drop shadows
+   (the drafts have none); the 1px line around each card stays. */
+:root {
+  --ux-accent: #1A1916;
+  --ux-accent-soft: rgba(26,25,22,.07);
+  --ux-grad: linear-gradient(120deg,#1A1916,#1A1916);   /* flat ink, like the drafts' progress bars */
+  --ux-shadow: rgba(26,25,22,0);
+  --ux-shadow-strong: rgba(26,25,22,0);
+}

@@ -1,0 +1,15 @@
+/* The upstream light theme with only the tokens that miss 4.5:1 as text changed (2026-10-29).
+   Loaded after lcan-design/base.css, whose defaults are the upstream light values.
+   Each value keeps the upstream hue and saturation and lowers lightness (HLS) by the smallest step,
+   in 0.25-point steps, that reaches 4.5:1 on the page, card and secondary surface, plus:
+   --ux-accent  also on the upstream --ux-accent-soft badge and under #FFFFFF button text;
+   --ux-mint    also under #FFFFFF button text (042 '시작하기');
+   --ux-danger  also on its own 10% tint (023 '모두 끄기' hover, 072 '자세히'). */
+:root {
+  --ux-ink-3: #716C7A;     /* was #8E8A97 */
+  --ux-accent: #6450F1;    /* was #6A57F2 */
+  --ux-accent-2: #1C72BA;  /* was #2F8FE0 */
+  --ux-mint: #0E7E5C;      /* was #119C72 */
+  --ux-warn: #A85A18;      /* was #D6731E */
+  --ux-danger: #C0253F;    /* was #D93A55 */
+}

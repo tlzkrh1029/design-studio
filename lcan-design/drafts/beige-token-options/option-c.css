@@ -1,0 +1,10 @@
+/* Option C: option A with a violet accent. Only the accent tokens differ from A.
+   #4A3AA7 is a chart line colour in the beige drafts (the chat board); it is not used there for rise,
+   fall, near-threshold or done, so it does not take over another meaning. */
+:root {
+  --ux-accent: #4A3AA7;
+  --ux-accent-soft: rgba(74,58,167,.12);
+  --ux-grad: linear-gradient(120deg,#4A3AA7,#4A3AA7);
+  --ux-shadow: rgba(26,25,22,0);
+  --ux-shadow-strong: rgba(26,25,22,0);
+}

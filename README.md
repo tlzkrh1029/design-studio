@@ -9,7 +9,7 @@
 | [book-design/](book-design/) | 서고의 표지와 페이지('크립토 브리핑 서고', '국채 및 경제 매크로 서고') | 크립토 브리핑 서고의 8번째 판(밤의 가판대 테마와 지난 호 열람 창)이 게시되어 있습니다. | [HANDOFF.md](book-design/HANDOFF.md) |
 | [artifact-design/](artifact-design/) | 아티팩트의 디자인과 스타일. 대시보드에 한정하지 않으며, 대시보드 대안 시안 5종(판정형 브리핑, 예외 기반 알림, 지표 트리, 대화형 분석, 에이전트형 분석)에서 출발합니다. | 시안 두 개의 원본이 `drafts/`에 있고, 패턴 세 개(위치 지도와 거리 막대, 사이트 대문, 은어 문구)가 `patterns/`에 있습니다. 대시보드 대안 시안 속 크립토 내용은 예시이며, 이 작업은 디자인과 스타일만 다룹니다. 기준선은 아직 정하지 않았습니다. | [HANDOFF.md](artifact-design/HANDOFF.md) |
 | [crypto-dashboard-design/](crypto-dashboard-design/) | 미국 증시·크립토 모니터링 화면. 지금은 미국 섹터 모니터링 화면(섹터 전환 매트릭스, 거래소 상장 표시, 돌파 지도)을 다루며, 하위 개념인 블룸버그 스타일 크립토 대시보드를 `bloomberg-style/`에 둡니다. | 블룸버그 스타일 시안 네 개의 원본과 사례 캡처 두 장이 `bloomberg-style/`에 있습니다. 기준선은 아직 정하지 않았습니다. | [HANDOFF.md](crypto-dashboard-design/HANDOFF.md) |
-| [lcan-design/](lcan-design/) | 외부 UI 요소를 작업별 스타일에 맞게 고친 사본. [Lucian UX/UI Prompt](https://lucianlabs.dev/uxui-prompt/)(MIT)의 요소 가운데 필요한 것만 가져와, 세 작업이 각자의 스타일로 쓸 수 있게 고칩니다. 원작자와 관계가 없는 사본입니다. | 폴더 구조와 규칙을 정하고, 원본을 커밋 `7e339fa`에 고정했습니다. 요소의 색과 모양 값은 각 작업 폴더의 `lcan-theme.css`가 정하며, 지금은 artifact-design 베이지 스타일의 초안만 있습니다. 채택한 요소는 아직 없습니다. | [HANDOFF.md](lcan-design/HANDOFF.md) |
+| [lcan-design/](lcan-design/) | 외부 UI 요소를 디자인 원칙에 맞게 보정한 사본. [Lucian UX/UI Prompt](https://lucianlabs.dev/uxui-prompt/)(MIT)의 요소 가운데 필요한 것을 가져와, 모양은 원본 그대로 두고 디자인 원칙에 못 미치는 값만 고쳐서 세 작업이 함께 씁니다. 원작자와 관계가 없는 사본입니다. | 원본을 커밋 `7e339fa`에 고정했습니다. 두 번의 비교 끝에 공통 테마 `lcan-theme.css`(원본 값에서 명암비가 모자란 토큰 여섯 개만 보정)를 정했고, 비교 두 개가 `drafts/`에 있습니다. 실제 작업 화면에 넣은 요소는 아직 없습니다. | [HANDOFF.md](lcan-design/HANDOFF.md) |
 
 ## 폴더 안내
 
@@ -25,7 +25,7 @@ design-studio/
 ├── artifact-design/          작업 2: 아티팩트의 디자인과 스타일(내용은 예시)
 │   ├── HANDOFF.md            인계 문서
 │   ├── AGENTS.md             이 작업에만 해당하는 규칙
-│   ├── lcan-theme.css        lcan-design의 요소에 베이지 스타일을 적용하는 테마 파일(초안)
+│   ├── lcan-theme.css        (쓰지 않음) lcan-design의 요소에 베이지 스타일을 적용해 본 테마 파일. 첫 비교의 기록
 │   ├── patterns/             다시 쓰는 디자인: 위치 지도와 거리 막대(location-map), 사이트 대문(site-launcher), 은어 문구(coded-copy)
 │   └── drafts/               시안 원본: 대시보드 대안 시안 5종, 상권 지도 시안
 ├── crypto-dashboard-design/  작업 3: 미국 증시·크립토 모니터링 화면
@@ -34,11 +34,14 @@ design-studio/
 │   └── bloomberg-style/      하위 개념: 블룸버그 스타일 크립토 대시보드
 │       ├── README.md         스타일 설명과 사례 캡처 2장
 │       └── drafts/           시안 원본: 섹터 전환 터미널, 거래소 상장 표시, 돌파 장부, 돌파 벽
-└── lcan-design/              작업 4: 외부 UI 요소를 작업별 스타일에 맞게 고친 사본(원작자와 관계없음)
-    ├── README.md             폴더 안내, 채택한 요소, 작업별 테마 파일 위치
+└── lcan-design/              작업 4: 외부 UI 요소를 디자인 원칙에 맞게 보정한 사본(원작자와 관계없음)
+    ├── README.md             쓰는 방법, 폴더 안내, 테마, 들인 요소
     ├── HANDOFF.md            인계 문서
     ├── AGENTS.md             이 작업에만 해당하는 규칙
-    └── upstream/             고정한 커밋의 원본(Lucian UX/UI Prompt, MIT)
+    ├── base.css              토큰 이름과 원본 기본값, 공통 규칙
+    ├── lcan-theme.css        모든 작업이 쓰는 공통 테마(원본 값에 명암비 보정)
+    ├── upstream/             고정한 커밋의 원본(Lucian UX/UI Prompt, MIT)
+    └── drafts/               비교한 시안: 베이지 스타일 세 안, 원본과 명암비 보정판
 ```
 
 ## 이어받는 방법
@@ -69,6 +72,7 @@ https://github.com/tlzkrh1029/design-studio 저장소의 <폴더> 작업을 이�
 - 2026-10-05: '건대스타시티점 브리핑'의 상권 지도를 다시 디자인하면서 `artifact-design/patterns/location-map/`(위치 지도와 거리 막대)을 만들고, 비교한 시안을 `artifact-design/drafts/location-map-drafts/`로 내보냈습니다. 같은 날 디자인 원칙 8(지도)을 더했습니다.
 - 2026-10-13: 'WMA 3:10 Crypto Screener' 대문을 다시 디자인한 결과를 `artifact-design/patterns/site-launcher/`(사이트 대문)와 `artifact-design/patterns/coded-copy/`(은어 문구)로 남기고, 디자인 원칙 9(배경 캡처)를 더했습니다. 대문에 쓴 은어와 원래 뜻의 짝(해설)은 사용자의 결정에 따라 저장소에 올리지 않습니다.
 - 2026-10-28: 새 작업 `lcan-design/`(작업 4)을 만들었습니다. [Lucian UX/UI Prompt](https://lucianlabs.dev/uxui-prompt/)(MIT)의 요소를 작업별 스타일에 맞게 고친 사본을 두는 곳이며, 원작자와 관계가 없습니다. 원본은 커밋 `7e339fa`에 고정했고, 요소의 색과 모양 값은 각 작업 폴더의 `lcan-theme.css`가 정합니다. 첫 테마 파일로 artifact-design 베이지 스타일의 초안을 더했습니다.
+- 2026-10-29: lcan-design에서 두 번 비교했습니다. 요소를 베이지 스타일로 다시 칠한 세 안보다 원본이 낫다는 사용자의 판단에 따라, 요소의 모양은 원본 그대로 두고 글자 명암비가 모자란 토큰 여섯 개만 보정한 공통 테마 `lcan-design/lcan-theme.css`를 정했습니다. 두 비교는 `lcan-design/drafts/`로 내보냈고, 베이지 테마 초안 `artifact-design/lcan-theme.css`는 쓰지 않는 파일로 표시했습니다.
 
 ## 공개 범위
 

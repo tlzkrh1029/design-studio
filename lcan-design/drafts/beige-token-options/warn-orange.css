@@ -1,0 +1,5 @@
+/* Decision 2, orange: replaces the gold warning colour in common.css.
+   The upstream warning colour #D6731E, darkened to reach 4.5:1 on all three beige surfaces. */
+:root {
+  --ux-warn: #A05616;
+}

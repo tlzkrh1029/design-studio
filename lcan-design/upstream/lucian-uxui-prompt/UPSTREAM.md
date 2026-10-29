@@ -7,7 +7,7 @@
 | 원본 저장소 | https://github.com/Seokwoooo/lucian-uxui-prompt |
 | 갤러리 | https://lucianlabs.dev/uxui-prompt/ |
 | 고정한 커밋 | `7e339faa1cc5e87496cb7ce556a5b22aadbe76f8`(2026-10-16 18:26, 한국 시간) |
-| 가져온 날짜 | 2026-10-28 |
+| 가져온 날짜 | 2026-10-28(LICENSE, tokens.css), 2026-10-29(요소 세 개) |
 | 라이선스 | MIT, Copyright (c) 2026 Seokwoooo([LICENSE](LICENSE)) |
 
 ## 파일
@@ -16,6 +16,9 @@
 | --- | --- | --- |
 | LICENSE | `LICENSE` | MIT 라이선스 원문입니다. |
 | tokens.css | `api/v1/ko/tokens.css` | `--ux-*` 토큰의 라이트·다크 값과 `.ux` 공통 규칙입니다. `src/tokens.css`와 내용이 같고, 맨 위에 라이선스 주석 두 줄이 더 붙어 있습니다. |
+| 023-settings-switch-list.html | `api/v1/ko/e/023.txt` | 펼쳐지는 알림 설정. 첫 비교와 둘째 비교의 시험 요소입니다. |
+| 042-wizard-stepper.html | `api/v1/ko/e/042.txt` | 단계 진행 마법사. 첫 비교와 둘째 비교의 시험 요소입니다. |
+| 072-inline-alert-dismiss.html | `api/v1/ko/e/072.txt` | 접히는 인라인 알림. 첫 비교와 둘째 비교의 시험 요소입니다. |
 
 요소 원본은 들이기로 정한 것만 `api/v1/ko/e/NNN.txt`에서 내용 그대로 복사해 `NNN-<영문 이름>.html`로 저장하고, 위 표에 한 줄씩 더합니다. 영문 이름은 원본 `src/elements/`의 파일 이름을 따릅니다. 한국어판 파일에는 라이선스 주석과 요소 설명이 들어 있고, 갤러리 전용 시연 코드는 들어 있지 않습니다.
 

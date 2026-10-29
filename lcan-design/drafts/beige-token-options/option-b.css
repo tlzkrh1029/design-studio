@@ -1,0 +1,9 @@
+/* Option B: option A plus shadows. Only the two shadow tokens differ from A.
+   The alphas are the upstream light values (.14 and .30); the colour is ink instead of the upstream violet. */
+:root {
+  --ux-accent: #1A1916;
+  --ux-accent-soft: rgba(26,25,22,.07);
+  --ux-grad: linear-gradient(120deg,#1A1916,#1A1916);
+  --ux-shadow: rgba(26,25,22,.14);
+  --ux-shadow-strong: rgba(26,25,22,.3);
+}
